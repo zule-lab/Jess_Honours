@@ -33,7 +33,7 @@ migratory_data_2024 <- yard_data_2024[yard_data_2024$Date <= "2024-06-01",]
 write.csv(migratory_data_2024, file = "cleaned_migratory_data_2024.csv", row.names = FALSE)
 
 # 2025
-migratory_data_2025 <- yard_data_2025[yard_data_2025$Date <= "2024-06-01",]
+migratory_data_2025 <- yard_data_2025[yard_data_2025$Date <= "2025-06-01",]
 write.csv(migratory_data_2025, file = "cleaned_migratory_data_2025.csv", row.names = FALSE)
 
 
@@ -45,13 +45,13 @@ breeding_data_2024 <- yard_data_2024[yard_data_2024$Date > "2024-06-01",]
 write.csv(breeding_data_2024, file = "cleaned_breeding_data_2024.csv", row.names = FALSE)
 
 # 2025
-breeding_data_2025 <- yard_data_2025[yard_data_2025$Date > "2024-06-01",]
+breeding_data_2025 <- yard_data_2025[yard_data_2025$Date > "2025-06-01",]
 write.csv(breeding_data_2025, file = "cleaned_breeding_data_2025.csv", row.names = FALSE)
 
 
 
 ################################# NEW DATASETS #################################
-# Stack the datasets together, and export them as new datasets
+# Stack the data frames together, and export them as new datasets
 # Migratory data
 migratory_data <- rbind(migratory_data_2024, migratory_data_2025)
 write.csv(migratory_data, file = "cleaned_migratory_data.csv", row.names = FALSE)
