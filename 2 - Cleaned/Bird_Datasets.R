@@ -1,9 +1,13 @@
 # 03-Dec-2025                CLEANING THE DATASETS
 
+# DESCRIPTION: Splitting of cleaned observational data (essentially my raw data)
+# into functional data frames in the context of my project (i.e., splitting them
+# by season and year).
+
+
 
 ############################### EXTRACTING YARDS ###############################
-# Importing data and extracting only observations from yards
-
+# Importing data and extracting only observations from yards, not from streets.
 # 2024 yard data
 data_2024 <- 
   read_csv("~/Desktop/Jess_Honours/1 - Input/ndg_cleaneddata_2024.csv")
@@ -43,6 +47,7 @@ write.csv(breeding_data_2024, file = "cleaned_breeding_data_2024.csv", row.names
 # 2025
 breeding_data_2025 <- yard_data_2025[yard_data_2025$Date > "2024-06-01",]
 write.csv(breeding_data_2025, file = "cleaned_breeding_data_2025.csv", row.names = FALSE)
+
 
 
 ################################# NEW DATASETS #################################
