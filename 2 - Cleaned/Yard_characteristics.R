@@ -8,8 +8,9 @@ library(readr)
 library(dplyr)
 
 
+
 ##### 1. CENTROID POINT ######
-# Find the middle-most point in each backyard in decimal degrees and UTM. 
+# DEF: Find the middle-most point in each backyard in decimal degrees and UTM. 
 # (Note: front yards were not considered in this calculation because this would 
 # complicate the scaled calculations of yard features and so few of the 
 # observations occurred in front yards anyway.)
@@ -21,16 +22,19 @@ library(dplyr)
 centroid_data <- read_csv("~/Desktop/Jess_Honours/1 - Input/centroid_data.csv")
 
 
+
 ###### 2. AREA ######
-# Yard area calculated using Google Maps' Polygon Tool by visually drawing 
+# DEF: Yard area calculated using Google Maps' Polygon Tool by visually drawing 
 # quadrilateral around yard.
 # Area should also be found in Kayleigh's work, as this would also include front yards.
   # NOTE: need Mackenzie's list of yards to accomplish this
 # Extract area from centroid data:
 back_area <- centroid_data[centroid_data$back_area_ha] #FIX
 
+
+
 ##### 3. NUMBER OF TREES AND SHRUBS PER YARD #####
-# Count the number of trees (1 stem) and shrubs (>1 stem) in yards from 
+# DEF: Count the number of trees (1 stem) and shrubs (>1 stem) in yards from 
 # yard_trees_verified data frame.
 # Import yard_trees_verified:
 yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
@@ -44,14 +48,15 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 ##### 4.TREE AND SHRUB DENSITY #####
-# Calculated the density of tree and shrubs in backyards based on their count yard area.
+# DEF: Calculated the density of tree and shrubs in backyards based on their count yard area.
 
 # Write function
 
 
 
+
 ##### 5. AVERAGE DBH #####
-# Find the average DBH for the plants in each yard from the DBHs in yard_trees_verified.
+# DEF: Find the average DBH for the plants in each yard from the DBHs in yard_trees_verified.
 
 # Sum the DBHs & divide by the number of stems for each yard:
 
@@ -59,7 +64,7 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 ##### 6. NUMBER OF BIG TREES #####
-# Find the number of trees in yards_trees_verified with a DBH greater than INSERT threshold.
+# DEF: Find the number of trees in yards_trees_verified with a DBH greater than INSERT threshold.
 
 # Extract only tree data from yards_trees_verified:
 
@@ -71,7 +76,7 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 ##### 7. NUMBER OF FRUITING PLANTS #####
-# Determine the number of fruiting plants in each yard.
+# DEF: Determine the number of fruiting plants in each yard.
 
 # Using the species listed in yard_trees_verified, determine which species are fruiting:
 
@@ -79,8 +84,19 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 
+
 ##### 8. BIRD SR (MIGRATORY & BREEDING) #####
-# Import bird data: cleaned_yard_data.csv, cleaned_migratory_data.csv, cleaned_breeding_data.csv
+# DEF: Take the bird species richness measures for each yard calculated in SR.R script 
+# and add them into the yard_characteristics data frame. This should include: 
+  # SR_migration_2024
+  # SR_migration_2025
+  # SR_migration
+  # SR_breeding_2024
+  # SR_breeding_2025
+  # SR_breeding
+  # SR_total
+
+
 # Find SR in yards in migration 2024
 
 # Find SR in yards in migration 2025
@@ -101,7 +117,7 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 
-##### Create & export a new dataset called yard_characteristics with these values
+##### Write and export a new dataframe called yard_characteristics with these values
 
 
 
