@@ -1,4 +1,4 @@
-﻿yard,back_area_ha,back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,long_radius_m,lat,long,utm_zone,utm_easting,utm_northing
+﻿Yard.Code,back_area_ha,back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,long_radius_m,lat,long,utm_zone,utm_easting,utm_northing
 Y03,0.025,63,22,23,8,12,45.45522,-73.64425,18,606004,5034416
 Y18,0.023,61,21,22,7,11,45.45611,-73.64467,18,605970,5034514
 Y28,0.017,53,18,19,6,9,45.45695,-73.64222,18,606160,5034610

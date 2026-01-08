@@ -6,6 +6,7 @@
 # Extracted data will be transformed into 2 data frames for future analysis: 
   # 1) wide and 2) long.
 
+library(readr)
 library(tidyverse)
 
 # Import cleaned observation data frames:
@@ -319,24 +320,48 @@ write.csv(b_yard_wide, file="b_yard_wide.csv", row.names=FALSE)
 
 
 
+
 ############################ 2. LONG SR DATA FRAME #############################
-# DEF: Species richness for each visit/yard.
-# Where each row is a visit/yard and the columns are SR.
-# The following long data frames will be made:
-  # a. SR_migration_2024
-  # b. SR_migration_2025
-  # c. SR_migration
-  # d. SR_breeding_2024
-  # e. SR_breeding_2025
-  # f. SR_breeding
-  # g. SR_total
+# DEF: Creating one STACKED long data frame containing the species richness for 
+# each yard.
+# Where each row is a visit/yard and the columns are SR and wide data frame 
+# identifier. The data frame identifiers will be the following:
+  # a. migration_2024
+  # b. migration_2025
+  # c. migration
+  # d. breeding_2024
+  # e. breeding_2025
+  # f. breeding
+  # g. total
 
-##### a. SR total long #####
+# Create function to calculate yard species richness from wide dataframe
+yard_richness <- function(yard_wide) {
+  yard_wide %>%
+    mutate(richness = rowSums(across(-Code))) %>% # -Unknown, -`NA`
+    select(Code, richness)
+}
 
+# Cleaning the wide data frames of NA and Unknown before SR calculation
+total_yard_wide_clean <- subset(total_yard_wide, select = -c(`NA`, Unknown))
+m24_yard_wide_clean <- subset(m24_yard_wide, select = -c(`NA`))
+m25_yard_wide_clean <- subset(m25_yard_wide, select = -c(`NA`,Unknown))
+m_yard_wide_clean <- subset(m_yard_wide, select = -c(`NA`, Unknown))
+b24_yard_wide_clean <- subset(b24_yard_wide, select = -c(`NA`))
+b25_yard_wide_clean <- subset(b25_yard_wide, select = -c(`NA`, Unknown))
+b_yard_wide_clean <- subset(b_yard_wide, select = -c(`NA`, Unknown))
 
-##### b. SR migratory_2024 long
-##### c. SR migratory_2025 long
-##### d. SR migratory long
-##### e. SR breeding_2024 long
-##### f. SR breeding_2025 long
-##### g. SR breeding long
+# Create stacked long data frame of species richness in yards
+SR_long <- bind_rows(
+  total         = yard_richness(total_yard_wide_clean),
+  mig_2024      = yard_richness(m24_yard_wide_clean),
+  mig_2025      = yard_richness(m25_yard_wide_clean),
+  mig_total     = yard_richness(m_yard_wide_clean),
+  breed_2024    = yard_richness(b24_yard_wide_clean),
+  breed_2025    = yard_richness(b25_yard_wide_clean),
+  breed_total   = yard_richness(b_yard_wide_clean),
+  .id = "dataset"
+)
+
+# Export Wide SR Presence-Absence Matrices
+write.csv(SR_long, file="SR_long.csv", row.names=FALSE)
+

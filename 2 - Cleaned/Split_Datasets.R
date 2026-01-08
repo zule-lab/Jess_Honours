@@ -4,7 +4,7 @@
 # into functional data frames in the context of my project (i.e., splitting them
 # by season and year).
 
-
+library(readr)
 
 ############################### EXTRACTING YARDS ###############################
 # Importing data and extracting only observations from yards, not from streets.

@@ -1,12 +1,11 @@
-# 03-Dec-2025           CREATING YARD CHARACTERISTIC DATASET
+# 07-Jan-2026           CREATING YARD CHARACTERISTIC DATASET
 
 # DESCRIPTION: Extraction of data pertaining to each yard and compilation into 
 # a single data frame called yard_characteristics. In other words, calculation 
 # of yard features.
 
 library(readr)
-library(dplyr)
-
+library(tidyverse)
 
 
 ##### 1. CENTROID POINT ######
@@ -20,16 +19,17 @@ library(dplyr)
     # (also calculated shortest and longest radii from the centroid within the yard)
 # Import data here:
 centroid_data <- read_csv("~/Desktop/Jess_Honours/1 - Input/centroid_data.csv")
+centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_data), ] # remove extra row that appeared in import
+
 
 
 
 ###### 2. AREA ######
 # DEF: Yard area calculated using Google Maps' Polygon Tool by visually drawing 
-# quadrilateral around yard.
+# quadrilateral around yard. Included in centroid_data.
 # Area should also be found in Kayleigh's work, as this would also include front yards.
-  # NOTE: need Mackenzie's list of yards to accomplish this
-# Extract area from centroid data:
-back_area <- centroid_data[centroid_data$back_area_ha] #FIX
+  # NOTE: need Mackenzie's list of yards to accomplish this and compare
+back_area <- subset(centroid_data, select = c(Yard.Code, back_area_ha))
 
 
 
@@ -37,12 +37,28 @@ back_area <- centroid_data[centroid_data$back_area_ha] #FIX
 # DEF: Count the number of trees (1 stem) and shrubs (>1 stem) in yards from 
 # yard_trees_verified data frame.
 # Import yard_trees_verified:
-yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
+yard_plants_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
 
-# Number of trees per yard:
+# Write and use function that counts number of trees and shrubs in each yard
+count_trees_shrubs <- function(plant_df) {
+  plant_df %>%
+    # classify trees and shrubs by number of stems
+    mutate(plant_type = if_else(Number.stems == 1, "Tree", "Shrub")) %>%
+    # treat each combination of yard and plant type as its own group
+    group_by(Yard.Code, plant_type) %>%
+    # collapse each group into one row
+    summarise(n = n(), .groups = "drop") %>% # n: row count, "drop" removes grouping structure
+    # reshape to yard-level
+    pivot_wider(
+      names_from  = plant_type, # becomes column names
+      values_from = n, # fills column with n values
+      values_fill = 0 # inserts 0 if there's no trees/shrubs
+    )
+}
+tree_shrub_count <- count_trees_shrubs(yard_plants_verified)
 
-
-# Number of shrubs per yard
+##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
+##### ALSO: IS THE BEST WAY TO DIFFERENTIATE TREES AND SHRUBS BY THE NUMBER OF STEMS???
 
 
 
@@ -50,35 +66,114 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 ##### 4.TREE AND SHRUB DENSITY #####
 # DEF: Calculated the density of tree and shrubs in backyards based on their count yard area.
 
-# Write function
+# Join back_area with tree_shrub_count
+area_and_veg_df <- back_area %>%
+  left_join(tree_shrub_count, by = c("Yard.Code" = "Yard.Code"))
+
+# Write & use function to calculate density (count/area)
+calc_tree_shrub_density <- function(data, area_col = back_area_ha) {
+  data %>%
+    mutate(
+      tree_density  = Tree  / {{ area_col }},
+      shrub_density = Shrub / {{ area_col }}
+    )
+}
+density_df <- calc_tree_shrub_density(area_and_veg_df)
+
+##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
+##### ALSO: IS THE BEST WAY TO DIFFERENTIATE TREES AND SHRUBS BY THE NUMBER OF STEMS???
 
 
 
 
 ##### 5. AVERAGE DBH #####
-# DEF: Find the average DBH for the plants in each yard from the DBHs in yard_trees_verified.
+# DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
+# the DBHs in yard_plants_verified
 
-# Sum the DBHs & divide by the number of stems for each yard:
+# Function that finds DBH of trees, shrubs, and all plants from dataframe
+mean_dbh_by_yard <- function(plant_df) {
+  plant_df %>%
+    # Sort each row as a tree or shrubs based on number of stems
+    mutate(plant_type = if_else(Number.stems == 1, "Tree", "Shrub")) %>%
+    # Group by yards
+    group_by(Yard.Code) %>%
+    # Find DBHs for all plants, trees, and shrubs
+    summarise(
+      mean_dbh_all = mean(DBH, na.rm = TRUE),
+      
+      mean_dbh_tree = if_else( # If trees are present, find mean DBH
+        sum(plant_type == "Tree") > 0,
+        mean(DBH[plant_type == "Tree"], na.rm = TRUE),
+        NA_real_ # Else, NA
+      ),
+      
+      mean_dbh_shrub = if_else( # If shrubs are present, find mean DBH
+        sum(plant_type == "Shrub") > 0,
+        mean(DBH[plant_type == "Shrub"], na.rm = TRUE),
+        NA_real_ # Else, NA
+      ),
+      
+      .groups = "drop"
+    )
+}
+mean_DBH_df <- mean_dbh_by_yard(yard_plants_verified)
+
+##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
+##### ALSO: IS THE BEST WAY TO DIFFERENTIATE TREES AND SHRUBS BY THE NUMBER OF STEMS???
 
 
 
 
 ##### 6. NUMBER OF BIG TREES #####
-# DEF: Find the number of trees in yards_trees_verified with a DBH greater than INSERT threshold.
+# DEF: Find the number of trees in yard_plants_verified with a DBH greater than 
+# a threshold. 
 
-# Extract only tree data from yards_trees_verified:
+#Threshold determined based on avian ecology (30-60cm)
+# https://link-springer-com.proxy3.library.mcgill.ca/article/10.1007/s11676-024-01714-w#:~:text=Based%20on%20decision%20tree%20modelling,trees%20over%2010%20cm%20DBH.
+# "We wanted the model to reﬂectthe mean diameter of the cavity limb (21.6 cm; Jackson, 1976)so only included trees greater than 23 cm dbh and adjusted the densities to reﬂect these conditions"
+# From: https://www-sciencedirect-com.proxy3.library.mcgill.ca/science/article/pii/S0169204613002077?via%3Dihub
 
-# Create histogram to explore the range of DBHs to find threshold X:
+# Subset yard_plants_verified to include only trees (i.e., 1 stem)
+yard_trees_verified <- yard_plants_verified[yard_plants_verified$Number.stems == 1,]
 
-# Find number of trees with DBH greater than X:
+# Examine distribution of DBH values
+summary(yard_trees_verified) 
+# extract mean, median, 1st and 3rd quartiles
+mean_val = 21.04
+median_val = 14.50
+first_val = 8.00
+third_val = 27.25
+# plot histgram
+ggplot(data = yard_trees_verified, aes(x = DBH)) +
+  geom_histogram(binwidth = 2) +  
+  geom_vline(aes(xintercept = mean_val), color = "red", linetype = "solid", size = 0.5) + 
+  geom_vline(aes(xintercept = median_val), color = "blue", linetype = "solid", size = 0.5) + 
+  geom_vline(aes(xintercept = first_val), color = "purple", linetype = "solid", size = 0.5) + 
+  geom_vline(aes(xintercept = third_val), color = "purple", linetype = "solid", size = 0.5) + 
+  theme_bw()
+# threshold will be 45 because that is generally considered big tree
+
+
+# Find number of trees with DBH greater than X in each yard:
+count_big_trees <- yard_trees_verified %>%
+  group_by(Yard.Code) %>%
+  summarise(
+    n_big_trees = sum(DBH > 45, na.rm = TRUE), # threshold is 45
+    .groups = "drop"
+  )
 
 
 
 
 ##### 7. NUMBER OF FRUITING PLANTS #####
-# DEF: Determine the number of fruiting plants in each yard.
+# DEF: Calculate the number of fruiting plants in each yard.
 
-# Using the species listed in yard_trees_verified, determine which species are fruiting:
+# Using the species listed in yard_plants_verified, determine which species are fruiting:
+unique(yard_plants_verified$Plant.sci) # get list of species
+
+# Determine which ones are fruiting based on research (Missouri Botanical Garden)
+fruiting_sp <- c("Amelanchier canadensis","Celtis occidentalis","Euonymus alatus",
+                 "Berberis thunbergii")
 
 # Count the number of fruiting species in each yard:
 
@@ -86,32 +181,10 @@ yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ver
 
 
 ##### 8. BIRD SR (MIGRATORY & BREEDING) #####
-# DEF: Take the bird species richness measures for each yard calculated in SR.R script 
-# and add them into the yard_characteristics data frame. This should include: 
-  # SR_migration_2024
-  # SR_migration_2025
-  # SR_migration
-  # SR_breeding_2024
-  # SR_breeding_2025
-  # SR_breeding
-  # SR_total
+# DEF: Take the bird species richness measures for each yard calculated in SR.R 
+# script and stored in "SR_long.csv" and add them into the yard_characteristics 
+# data frame.
 
-
-# Find SR in yards in migration 2024
-
-# Find SR in yards in migration 2025
-
-# Find SR in yards in migration total
-
-# Find SR in yards in breeding 2024
-
-# Find SR in yards in breeding 2025
-
-# Find SR in yards in 2024
-
-# Find SR in yards in 2025
-
-# Find SR in yards total
 
 
 
