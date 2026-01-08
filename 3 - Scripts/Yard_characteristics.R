@@ -24,7 +24,7 @@ centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_da
 
 
 
-###### 2. AREA ######
+##### 2. AREA * ######
 # DEF: Yard area calculated using Google Maps' Polygon Tool by visually drawing 
 # quadrilateral around yard. Included in centroid_data.
 # Area should also be found in Kayleigh's work, as this would also include front yards.
@@ -33,7 +33,7 @@ back_area <- subset(centroid_data, select = c(Yard.Code, back_area_ha))
 
 
 
-##### 3. NUMBER OF TREES AND SHRUBS PER YARD #####
+##### 3. NUMBER OF TREES AND SHRUBS PER YARD ** #####
 # DEF: Count the number of trees (1 stem) and shrubs (>1 stem) in yards from 
 # yard_trees_verified data frame.
 # Import yard_trees_verified:
@@ -63,7 +63,7 @@ tree_shrub_count <- count_trees_shrubs(yard_plants_verified)
 
 
 
-##### 4.TREE AND SHRUB DENSITY #####
+##### 4. TREE AND SHRUB DENSITY ** #####
 # DEF: Calculated the density of tree and shrubs in backyards based on their count yard area.
 
 # Join back_area with tree_shrub_count
@@ -86,7 +86,7 @@ density_df <- calc_tree_shrub_density(area_and_veg_df)
 
 
 
-##### 5. AVERAGE DBH #####
+##### 5. AVERAGE DBH ** #####
 # DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
 # the DBHs in yard_plants_verified
 
@@ -124,7 +124,7 @@ mean_DBH_df <- mean_dbh_by_yard(yard_plants_verified)
 
 
 
-##### 6. NUMBER OF BIG TREES #####
+##### 6. NUMBER OF BIG TREES *** #####
 # DEF: Find the number of trees in yard_plants_verified with a DBH greater than 
 # a threshold. 
 
@@ -165,7 +165,7 @@ count_big_trees <- yard_trees_verified %>%
 
 
 
-##### 7. NUMBER OF FRUITING PLANTS #####
+##### 7. NUMBER OF FRUITING PLANTS **** #####
 # DEF: Calculate the number of fruiting plants in each yard.
 
 # Using the species listed in yard_plants_verified, determine which species are fruiting:
@@ -173,9 +173,22 @@ unique(yard_plants_verified$Plant.sci) # get list of species
 
 # Determine which ones are fruiting based on research (Missouri Botanical Garden)
 fruiting_sp <- c("Amelanchier canadensis","Celtis occidentalis","Euonymus alatus",
-                 "Berberis thunbergii")
+                 "Berberis thunbergii","Lonicera xylosteum","Magnolia soulangeana",
+                 "Malus baccata","Malus domestica","Malus sylvestris","Morus alba",
+                 "Prunus cerasus","Prunus communis","Prunus japonica","Pyrus communis",
+                 "Rhamnus cathartica","Sambucus nigra","Sorbus aucuparia","Taxus canadensis",
+                 "Tilia cordata") 
+                # Magnolia fruits in late summer/fall. 
+                # Check Tilia again (fruits don't seem to be good for birds)
 
 # Count the number of fruiting species in each yard:
+fruiting_count_by_yard <- yard_plants_verified %>%
+  mutate(is_fruiting = Plant.sci %in% fruiting_sp) %>%
+  group_by(Yard.Code) %>%
+  summarise(
+    n_fruiting_plants = sum(is_fruiting),
+    .groups = "drop"
+  )
 
 
 
@@ -185,14 +198,24 @@ fruiting_sp <- c("Amelanchier canadensis","Celtis occidentalis","Euonymus alatus
 # script and stored in "SR_long.csv" and add them into the yard_characteristics 
 # data frame.
 
+# Import SR_long.csv for species richnesses
+SR_long <- read_csv("3 - Extraction/SR_long.csv")
+
+# Convert into a wide data frame with the datasets as the columns and yards as rows
 
 
 
-
-
-##### Write and export a new dataframe called yard_characteristics with these values
-
-
+##### 9. WRITE & EXPORT #####
+# Def: write and export yard_characteristics.csv by binding the following data 
+# frames by yard codes:
+  # centroid data
+  # area
+  # number of trees and shrubs
+  # tree and shrub density
+  # average DBH
+  # number of big trees
+  # number of fruiting plants
+  # bird SR across seasons
 
 
 
