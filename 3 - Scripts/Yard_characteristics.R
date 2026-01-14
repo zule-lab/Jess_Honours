@@ -7,6 +7,13 @@
 library(readr)
 library(tidyverse)
 
+# PROBLEMS I am currently having:
+# *area: how do I get the conversion to Kayleigh's yards?
+# **yards: Y50 is missing from the tree dataset, Y25 is missing from centroid data
+# ***trees/shrubs: is the best way to differentiate them by stem number?
+# ****dbh: should i include shrubs in average DBH?
+# *****big: what should the threshold for big trees be?
+# ******fruit: what are the fruiting species?
 
 ##### 1. CENTROID POINT ######
 # DEF: Find the middle-most point in each backyard in decimal degrees and UTM. 
@@ -33,7 +40,7 @@ back_area <- subset(centroid_data, select = c(Yard.Code, back_area_ha))
 
 
 
-##### 3. NUMBER OF TREES AND SHRUBS PER YARD ** #####
+##### 3. NUMBER OF TREES AND SHRUBS PER YARD ** *** #####
 # DEF: Count the number of trees (1 stem) and shrubs (>1 stem) in yards from 
 # yard_trees_verified data frame.
 # Import yard_trees_verified:
@@ -43,7 +50,7 @@ yard_plants_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_ve
 count_trees_shrubs <- function(plant_df) {
   plant_df %>%
     # classify trees and shrubs by number of stems
-    mutate(plant_type = if_else(Number.stems == 1, "Tree", "Shrub")) %>%
+    mutate(plant_type = if_else(Number.stems == 1, "tree_count", "shrub_count")) %>%
     # treat each combination of yard and plant type as its own group
     group_by(Yard.Code, plant_type) %>%
     # collapse each group into one row
@@ -63,7 +70,7 @@ tree_shrub_count <- count_trees_shrubs(yard_plants_verified)
 
 
 
-##### 4. TREE AND SHRUB DENSITY ** #####
+##### 4. TREE AND SHRUB DENSITY ** *** #####
 # DEF: Calculated the density of tree and shrubs in backyards based on their count yard area.
 
 # Join back_area with tree_shrub_count
@@ -74,11 +81,15 @@ area_and_veg_df <- back_area %>%
 calc_tree_shrub_density <- function(data, area_col = back_area_ha) {
   data %>%
     mutate(
-      tree_density  = Tree  / {{ area_col }},
-      shrub_density = Shrub / {{ area_col }}
+      tree_density  = tree_count  / {{ area_col }},
+      shrub_density = shrub_count / {{ area_col }}
     )
 }
 density_df <- calc_tree_shrub_density(area_and_veg_df)
+
+# Remove the back_area_ha, Shrub, and Tree columns
+density_df <- density_df %>%
+  select(-back_area_ha, -tree_count, -shrub_count)
 
 ##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
 ##### ALSO: IS THE BEST WAY TO DIFFERENTIATE TREES AND SHRUBS BY THE NUMBER OF STEMS???
@@ -86,7 +97,7 @@ density_df <- calc_tree_shrub_density(area_and_veg_df)
 
 
 
-##### 5. AVERAGE DBH ** #####
+##### 5. AVERAGE DBH ** **** #####
 # DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
 # the DBHs in yard_plants_verified
 
@@ -94,7 +105,7 @@ density_df <- calc_tree_shrub_density(area_and_veg_df)
 mean_dbh_by_yard <- function(plant_df) {
   plant_df %>%
     # Sort each row as a tree or shrubs based on number of stems
-    mutate(plant_type = if_else(Number.stems == 1, "Tree", "Shrub")) %>%
+    mutate(plant_type = if_else(Number.stems == 1, "tree", "shrub")) %>%
     # Group by yards
     group_by(Yard.Code) %>%
     # Find DBHs for all plants, trees, and shrubs
@@ -102,14 +113,14 @@ mean_dbh_by_yard <- function(plant_df) {
       mean_dbh_all = mean(DBH, na.rm = TRUE),
       
       mean_dbh_tree = if_else( # If trees are present, find mean DBH
-        sum(plant_type == "Tree") > 0,
-        mean(DBH[plant_type == "Tree"], na.rm = TRUE),
+        sum(plant_type == "tree") > 0,
+        mean(DBH[plant_type == "tree"], na.rm = TRUE),
         NA_real_ # Else, NA
       ),
       
       mean_dbh_shrub = if_else( # If shrubs are present, find mean DBH
-        sum(plant_type == "Shrub") > 0,
-        mean(DBH[plant_type == "Shrub"], na.rm = TRUE),
+        sum(plant_type == "shrub") > 0,
+        mean(DBH[plant_type == "shrub"], na.rm = TRUE),
         NA_real_ # Else, NA
       ),
       
@@ -124,7 +135,7 @@ mean_DBH_df <- mean_dbh_by_yard(yard_plants_verified)
 
 
 
-##### 6. NUMBER OF BIG TREES *** #####
+##### 6. NUMBER OF BIG TREES ** *** ***** #####
 # DEF: Find the number of trees in yard_plants_verified with a DBH greater than 
 # a threshold. 
 
@@ -165,7 +176,7 @@ count_big_trees <- yard_trees_verified %>%
 
 
 
-##### 7. NUMBER OF FRUITING PLANTS **** #####
+##### 7. NUMBER OF FRUITING PLANTS ****** #####
 # DEF: Calculate the number of fruiting plants in each yard.
 
 # Using the species listed in yard_plants_verified, determine which species are fruiting:
@@ -195,27 +206,59 @@ fruiting_count_by_yard <- yard_plants_verified %>%
 
 ##### 8. BIRD SR (MIGRATORY & BREEDING) #####
 # DEF: Take the bird species richness measures for each yard calculated in SR.R 
-# script and stored in "SR_long.csv" and add them into the yard_characteristics 
-# data frame.
+# script and stored in "SR_long.csv" and convert them to a wide data frame.
 
 # Import SR_long.csv for species richnesses
 SR_long <- read_csv("3 - Extraction/SR_long.csv")
 
 # Convert into a wide data frame with the datasets as the columns and yards as rows
+richness_wide <- SR_long %>%
+  pivot_wider(
+    id_cols    = Code,
+    names_from = dataset,
+    values_from = richness
+  )
 
+# Rename Code column to Yard.Code for consistency, and add SR to richness columns
+# for clarity
+richness_wide <- richness_wide %>% 
+  rename(Yard.Code = Code,
+         SR_total = total,
+         SR_mig_2024 = mig_2024,
+         SR_mig_2025 = mig_2025,
+         SR_mig = mig_total,
+         SR_breed_2024 = breed_2024,
+         SR_breed_2025 = breed_2025,
+         SR_breed = breed_total)
 
 
 ##### 9. WRITE & EXPORT #####
 # Def: write and export yard_characteristics.csv by binding the following data 
 # frames by yard codes:
-  # centroid data
-  # area
-  # number of trees and shrubs
-  # tree and shrub density
-  # average DBH
-  # number of big trees
-  # number of fruiting plants
-  # bird SR across seasons
+  # centroid & area: centroid_data
+  # number of trees and shrubs: tree_shrub_count
+  # tree and shrub density: density_df
+  # average DBH: mean_DBH_df
+  # number of big trees: count_big_trees
+  # number of fruiting plants: fruiting_count_by_yard
+  # bird SR across seasons: richness_wide
+
+yard_characteristics <- Reduce(
+  function(x, y) full_join(x, y, by = "Yard.Code"),
+  list(
+    centroid_data,
+    tree_shrub_count,
+    density_df,
+    mean_DBH_df,
+    count_big_trees,
+    fruiting_count_by_yard,
+    richness_wide
+  )
+)
+
+# Export yard_characteristics data frame
+write.csv(yard_characteristics, file="yard_characteristics.csv", row.names=FALSE)
+
 
 
 
