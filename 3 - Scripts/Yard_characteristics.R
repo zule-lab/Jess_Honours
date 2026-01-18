@@ -1,6 +1,7 @@
 # 07-Jan-2026           CREATING YARD CHARACTERISTIC DATASET
 
-# DESCRIPTION: Extraction of data pertaining to each yard and compilation into 
+# DESCRIPTION: 
+# Extraction of data pertaining to each yard and compilation into 
 # a single data frame called yard_characteristics. In other words, calculation 
 # of yard features.
 
@@ -191,6 +192,27 @@ fruiting_sp <- c("Amelanchier canadensis","Celtis occidentalis","Euonymus alatus
                  "Tilia cordata") 
                 # Magnolia fruits in late summer/fall. 
                 # Check Tilia again (fruits don't seem to be good for birds)
+
+fruiting_sp <- c("Amelanchier canadensis", # ripe in June
+                 "Berberis thunbergii", # ripe in October and through winter
+                 "Lonicera xylosteum", # ripe in July and August
+                 "Malus baccata", # 
+                 "Malus domestica",
+                 "Malus sylvestris",
+                 "Morus alba", # ripe June to July
+                 "Prunus cerasus",#cerasifera, ripe June, July, August
+                 "Prunus communis",
+                 "Prunus japonica",
+                 "Pyrus communis",
+                 "Rhamnus cathartica",
+                 "Sambucus nigra",
+                 "Sorbus aucuparia",
+                 "Taxus canadensis",
+                 "Tilia cordata") # nutlet
+# "Euonymus alatus" fruits in fall
+# "Celtis occidentalis", nutlets persisting through fall
+# "Magnolia soulangeana" fruits in late summer/fall - and rarely and follicles
+# Check Tilia again (fruits don't seem to be good for birds)
 
 # Count the number of fruiting species in each yard:
 fruiting_count_by_yard <- yard_plants_verified %>%
