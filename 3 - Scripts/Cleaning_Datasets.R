@@ -1,6 +1,7 @@
 # 03-Dec-2025                CLEANING THE DATASETS
 
-# DESCRIPTION: Splitting of cleaned observational data (essentially my raw data)
+# DESCRIPTION: 
+# Splitting of cleaned observational data (essentially my raw data)
 # into functional data frames in the context of my project (i.e., splitting them
 # by season and year).
 

@@ -1,6 +1,7 @@
 # 02-Jan-2026              CREATING SPECIES RICHNESS DATA FRAMES
 
-# DESCRIPTION: Extraction of species richness (SR) data from cleaned observation data
+# DESCRIPTION: 
+# Extraction of species richness (SR) data from cleaned observation data
 # (cleaned_yard_data.csv, cleaned_migratory_data.csv, cleaned_breeding_data.csv)
 # for each visit in each yard in each season (breeding, migratory) and year (2024, 2025). 
 # Extracted data will be transformed into 2 data frames for future analysis: 
