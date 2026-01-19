@@ -5,6 +5,7 @@
 # into functional data frames in the context of my project (i.e., splitting them
 # by season and year).
 
+# PACKAGES USED:
 library(readr)
 
 ############################### EXTRACTING YARDS ###############################

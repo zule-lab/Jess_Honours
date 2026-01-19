@@ -5,6 +5,7 @@
 # a single data frame called yard_characteristics. In other words, calculation 
 # of yard features.
 
+# PACKAGES USED:
 library(readr)
 library(tidyverse)
 

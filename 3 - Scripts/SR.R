@@ -7,6 +7,7 @@
 # Extracted data will be transformed into 2 data frames for future analysis: 
   # 1) wide and 2) long.
 
+# PACKAGES USED:
 library(readr)
 library(tidyverse)
 
