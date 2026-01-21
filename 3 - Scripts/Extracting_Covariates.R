@@ -1,54 +1,30 @@
-# 18-Jan-2026            EXTRACTION OF LANDSCAPE-LEVEL HABITAT FEATURES
+# 18-Jan-2026
+# ============================================================================ # 
+#                 EXTRACTION OF LANDSCAPE-LEVEL HABITAT FEATURES
+# ============================================================================ # 
 
 # DESCRIPTION:
-# 
+# Extracting landscape-level habitat features in concentric buffers around 
+# centroid points in yards from the LiDAR products of the Forêt ouverte database.
 
-# Code adapted from Anne-Marie Cousineau and Vanessa Poirier, MSc candidates, 
-# McGill University & Barbara Frei, ECCC (barbara.frei@ec.gc.ca)
+# Data extracted at five spatial scales:
+  # 25 m, 50 m, 100 m, 200 m, 400 m
 
+# Landscape-level habitat feature include:
+  # tree height
+  # percent canopy cover
+  # percent impervious surface cover
+  # road length
+  # proportion of cover below 3 m
 
-## --- TABLE OF CONTENT --- ##
+# Code adapted from Anne-Marie Cousineau and Vanessa Poirier, MSc, McGill 
+# University & Barbara Frei, ECCC (barbara.frei@ec.gc.ca)
 
-# 1. LOADING FILES FOR TRUE AND RANDOM OBSERVATIONS, ALONG WITH RASTERS AND DESCRIPTION DATAFRAME
-
-# 2. EXTRACTING TREE HEIGHT COVARIATES FOR THE YEAR 2023-2024
-
-# 3. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2023-2024
-
-# 4. DATA PREPARATION FOR THE YEAR 2022-2023
-
-# 5. EXTRACTING COVARIATES FOR TREE HEIGHT DATA FOR 2022-2023
-
-# 6. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2022-2023
-
-# 7. DATA PREPARATION FOR THE YEAR 2024-2025
-
-# 8. EXTRACTING COVARIATES FOR TREE HEIGHT DATA FOR 2024-2025
-
-# 9. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2024-2025
-
-# 10. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2022-2023
-
-# 11. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2023-2024
-
-# 12. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2024-2025
-
-# 13. EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2022-2023
-
-# 14. EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2023-2024
-
-# 15.  EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2024-2025
-
-# 16. INVESTIGATING SITE DIFFERENCES WITH POPULATION DENSITY
-
-
-## --- Packages Used --- ##
-
-# library(rgdal) # rgdal isn't available anymore, the suggested replacement are the sf or terra
-# packages.
-# library(rgeos) -> not available anymore, integrated in the sf and terra packages.
-# library(landscapetools) -> not available anymore, integrated in the sf and terra packages.
-
+# PACKAGES USED:
+# library(rgdal) # rgdal isn't available anymore, the suggested replacement are 
+# the sf or terra packages.
+# library(rgeos) -> not available anymore, integrated in sf and terra packages.
+# library(landscapetools) -> not available anymore, integrated in sf and terra packages.
 library(cancensus)
 library(sf)
 library(terra)
@@ -68,20 +44,56 @@ library(progressr)
 
 rasterOptions(progress = "text")
 
+
+## --- TABLE OF CONTENT --- ##
+
+# 1. LOADING FILES FOR TRUE AND RANDOM OBSERVATIONS, ALONG WITH RASTERS AND DESCRIPTION DATAFRAME (need)
+
+# 2. EXTRACTING TREE HEIGHT COVARIATES FOR THE YEAR 2023-2024 (need)
+
+# 3. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2023-2024
+
+# 4. DATA PREPARATION FOR THE YEAR 2022-2023
+
+# 5. EXTRACTING COVARIATES FOR TREE HEIGHT DATA FOR 2022-2023
+
+# 6. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2022-2023
+
+# 7. DATA PREPARATION FOR THE YEAR 2024-2025 (need)
+
+# 8. EXTRACTING COVARIATES FOR TREE HEIGHT DATA FOR 2024-2025 (need)
+
+# 9. EXTRACTING COVARIATES FOR POPULATION DATA FOR 2024-2025
+
+# 10. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2022-2023
+
+# 11. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2023-2024 (need)
+
+# 12. EXTRACTING ROADS LENGTHS COVARIATES FOR THE YEAR 2024-2025 (need)
+
+# 13. EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2022-2023
+
+# 14. EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2023-2024
+
+# 15.  EXTRACTING DISTANCE TO CLOSEST FEEDER FOR THE YEAR 2024-2025
+
+# 16. INVESTIGATING SITE DIFFERENCES WITH POPULATION DENSITY
+
+
 # =============================================================================================== #
 # 1. LOADING FILES FOR TRUE AND RANDOM OBSERVATIONS, ALONG WITH RASTERS AND DESCRIPTION DATAFRAME #
 # =============================================================================================== #
 
 ## --- 1.1. RASTERS --- ##
 
-# First, loading the raster file for the canopy height extracted from OpenForest.
+###### First, loading the raster file for the canopy height extracted from OpenForest. #######
 canopy.ras.1 <- rast("01_downloaded_data/raster_canopee_2950_zone1.tif")
 canopy.ras.2 <- rast("01_downloaded_data/raster_canopee_2950_zone2.tif")
 
 canopy.ras <- merge(canopy.ras.1, canopy.ras.2)
 canopy.ras <- raster(canopy.ras)
 
-# Second, loading the population data from cancensus package.
+######  Second, loading the population data from cancensus package. ###### 
 # To use the data from CanCensus you need a personal API key. Enter it here after creating an
 # account.
 options(cancensus.api_key='CensusMapper_6206ab5a091356ca39a9dc940abfc253')
@@ -150,17 +162,24 @@ app_duplex_raster <- raster_results$app_duplex
 app_less_5_raster <- raster_results$app_less_5
 app_over_5_raster <- raster_results$app_over_5
 
-# Third, get streets and roads data.
+
+###### Third, get streets and roads data. ######
 # Load road polygons
 roads <- st_read("01_downloaded_data/streets_22/VOI_VOIRIE_S_V22.shp")
 
-## --- 1.2. NOCA POINTS & RANDOM POINTS --- ##
+
+
+## --- 1.2. CENTROID POINTS --- ##
+# previously called NOCA POINTS & RANDOM POINTS
 
 # Loading the csv file for the true observations, filtered in the project noca_2324_random_points_creation.R.
 noca.obs2324.df <- read.csv("02_cleaned_data/noca_2324_cleaned.csv")
 
 # Loading the csv file for the randomly generated points with a 1:1 ratio from noca_2324_random_points_creation.R.
 noca.ran2324.df <- read.csv("03_processed_data/noca_2324_ran_points.csv")
+
+## Load the csv file for the centroid points of each yard
+
 
 ## --- 1.3. DATA PREPARATION --- ##
 
