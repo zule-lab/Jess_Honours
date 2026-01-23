@@ -1,6 +1,6 @@
 # 18-Jan-2026                          
 # ============================================================================ # 
-#                                 DATA EXPLORATION
+#                          EXPLORATION DATA ANALYSIS
 # ============================================================================ # 
 
 # DESCRIPTION: 
@@ -13,29 +13,117 @@ library(ggplot2)
 library(dplyr)
 
 
+
 # ============================================================================ # 
-# SUMMARY STATISTICS  
+# 1. SPECIES RICHNESS ACROSS SEASONS
 # ============================================================================ # 
 
-cleaned_breeding_data_2024 <- read_csv("4 - Cleaned/cleaned_breeding_data_2024.csv")
-cleaned_breeding_data_2025 <- read_csv("4 - Cleaned/cleaned_breeding_data_2025.csv")
-cleaned_breeding_data <- read_csv("4 - Cleaned/cleaned_breeding_data.csv")
+# --- 1.1 TOTAL NUMBER OF OBSERVATIONS --- #
+
+# Function 1.1
+num_observations <- function(cleaned_df){
+  nrow(cleaned_df)
+}
+# 1.11 Total
+cleaned_yard_data <- read_csv("2 - Cleaned/cleaned_yard_data.csv")
+
+
+# 1.12 Migration
 cleaned_migratory_data_2024 <- read_csv("4 - Cleaned/cleaned_migratory_data_2024.csv")
 cleaned_migratory_data_2025 <- read_csv("4 - Cleaned/cleaned_migratory_data_2025.csv")
 cleaned_migratory_data <- read_csv("4 - Cleaned/cleaned_migratory_data.csv")
-cleaned_yard_data <- read_csv("4 - Cleaned/cleaned_yard_data.csv")
+
+
+# 1.13 Breeding
+cleaned_breeding_data_2024 <- read_csv("4 - Cleaned/cleaned_breeding_data_2024.csv")
+cleaned_breeding_data_2025 <- read_csv("4 - Cleaned/cleaned_breeding_data_2025.csv")
+cleaned_breeding_data <- read_csv("4 - Cleaned/cleaned_breeding_data.csv")
+
+
+
+# --- 1.2 OVERALL SPECIES RICHNESS --- #
+
+# Function 1.2
+SR <- function(yard_wide){
+  yard_wide = select(yard_wide,-c(Code,`NA`, Unknown))
+  return(ncol(yard_wide))
+}
+# 1.21 Total
+total_yard_wide <- read_csv("4 - Outputs/SR matrices/total_yard_wide.csv")
+num_observations_total = num_observations(cleaned_yard_data)
+
+
+# 1.22 Migration
+m24_yard_wide <- read_csv("4 - Outputs/SR matrices/m24_visit_wide.csv")
+m25_yard_wide <- read_csv("4 - Outputs/SR matrices/m25_visit_wide.csv")
+m_yard_wide <- read_csv("4 - Outputs/SR matrices/m_visit_wide.csv")
+
+
+# 1.23 Breeding
+b24_yard_wide <- read_csv("4 - Outputs/SR matrices/b24_visit_wide.csv")
+b25_yard_wide <- read_csv("4 - Outputs/SR matrices/b25_visit_wide.csv")
+b_yard_wide <- read_csv("4 - Outputs/SR matrices/b_visit_wide.csv")
+
+
+
+
+# --- 1.3 AVERAGE SPECIES RICHNESS PER YARD --- #
+
+# Function 1.3
+avgSR_yard <- function(long_df,season){
+  season_long = long_df[long_df$dataset==season,]
+  return(mean(season_long$richness))
+}
+
 SR_long <- read_csv("4 - Outputs/SR_long.csv")
+
+# 1.31 Total
+total_avgSR_yard = avgSR_yard(SR_long, season="total")
+
+# 1.32 Migration
+
+
+# 1.33 Breeding
+
+
+
+
+# --- 1.4 AVERAGE SPECIES RICHNESS PER VISIT --- #
+
+# Function 1.4
+avgSR_visit <- function(visit_wide) {
+  visit_wide = select(visit_wide,-c(Code,Date,`NA`,Unknown))
+  richness = rowSums(visit_wide)
+  return(mean(richness))
+}
+
+# 1.41 Total
 total_visit_wide <- read_csv("4 - Outputs/SR matrices/total_visit_wide.csv")
-b24_visit_wide <- read_csv("4 - Outputs/SR matrices/b24_visit_wide.csv")
-b25_visit_wide <- read_csv("4 - Outputs/SR matrices/b25_visit_wide.csv")
-b_visit_wide <- read_csv("4 - Outputs/SR matrices/b_visit_wide.csv")
+total_avgSR_visit = avgSR_visit(total_visit_wide)
+
+
+# 1.42 Migration
 m24_visit_wide <- read_csv("4 - Outputs/SR matrices/m24_visit_wide.csv")
 m25_visit_wide <- read_csv("4 - Outputs/SR matrices/m25_visit_wide.csv")
 m_visit_wide <- read_csv("4 - Outputs/SR matrices/m_visit_wide.csv")
 
+
+# 1.43 Breeding
+b24_visit_wide <- read_csv("4 - Outputs/SR matrices/b24_visit_wide.csv")
+b25_visit_wide <- read_csv("4 - Outputs/SR matrices/b25_visit_wide.csv")
+b_visit_wide <- read_csv("4 - Outputs/SR matrices/b_visit_wide.csv")
+
+
+
+
+
+# ============================================================================ # 
+# 2. YARD HABITAT FEATURES  
+# ============================================================================ # 
+
 # --- 1. YARD HABITAT FEATURES --- #
 
-#### 1.1 Find mean, range, and SD of the following: ####
+# 1.1 Find mean, range, and SD of the following:
       # •	Average area
       # •	Number of trees
       # •	Number of shrubs
@@ -65,7 +153,8 @@ summary_yard_features <- as.data.frame( # return data frame, not matrix
 )
 
 
-#### 1.2 Find abundance of plant species in yards ####
+
+# 1.2 Find abundance of plant species in yards
 
 # Import data
 yard_trees_verified <- read_csv("1 - Input/yard_trees_verified.csv")
@@ -109,119 +198,6 @@ ggplot(species_abundance,
 
 
 
-
-
-
-total_yard_wide <- read_csv("4 - Outputs/SR matrices/total_yard_wide.csv")
-
-
-
-# --- 2. SPECIES RICHNESS OVERALL --- #
-
-#### .1 Total number of observations
-# Load observation data
-
-# Count number of rows
-
-
-#### 2.2 Species richness ####
-# Load presence-absence matrix for birds species in yards
-
-# SR is number of columns (minus NA and Unknown)
-
-
-# 2.3 Species frequency of presence in yards
-# Load presence-absence matrix for birds species in yards
-
-# Calculate frequency of presence for each species
-
-
-# 2.4 Average number of species per yard
-# Load species richness per yard long data frame
-
-# Take mean of species richness column values for the season
-
-
-# 2.5 Average number of species per visit
-# Load presence-absence matrix for bird species per visit
-
-# Find species richness per visit
-
-# Take mean of species richness column values for the season
-
-
-
-
-# --- 3. SPECIES RICHNESS MIGRATION --- #
-
-#### 3.1 Total number of observations
-# Load observation data
-
-# Count number of rows
-
-#### 3.2 Species richness ####
-# Load presence-absence matrix for birds species in yards
-
-# SR is number of columns (minus NA and Unknown)
-
-
-# 3.3 Species frequency of presence in yards
-# Load presence-absence matrix for birds species in yards
-
-# Calculate frequency of presence for each species
-
-
-# 3.4 Average number of species per yard
-# Load species richness per yard long data frame
-
-# Take mean of species richness column values for the season
-
-
-# 3.5 Average number of species per visit
-# Load presence-absence matrix for bird species per visit
-
-# Find species richness per visit
-
-# Take mean of species richness column values for the season
-
-
-
-
-# --- 4. SPECIES RICHNESS BREEDING --- #
-
-#### 4.1 Total number of observations
-# Load observation data
-
-# Count number of rows
-
-#### 4.2 Species richness ####
-# Load presence-absence matrix for birds species in yards
-
-# SR is number of columns (minus NA and Unknown)
-
-
-# 4.3 Species frequency of presence in yards
-# Load presence-absence matrix for birds species in yards
-
-# Calculate frequency of presence for each species
-
-
-# 4.4 Average number of species per yard
-# Load species richness per yard long data frame
-
-# Take mean of species richness column values for the season
-
-
-# 4.5 Average number of species per visit
-# Load presence-absence matrix for bird species per visit
-
-# Find species richness per visit
-
-# Take mean of species richness column values for the season
-
-
-
-
 # --- 5. SPECIES-SPECIFIC DATA --- #
 
 # 5.1. Species presence in each season
@@ -230,7 +206,8 @@ total_yard_wide <- read_csv("4 - Outputs/SR matrices/total_yard_wide.csv")
 # 5.2 Frequency of presence (number of visits OR yards in which it was present)
 
 
-# 5.3 Number of yards in which it was presnde
+# 5.3 Number of yards in which it was present
+
 
 
 
@@ -296,6 +273,7 @@ yard_characteristics <- read_csv("yard_characteristics.csv")
 # --- X. LANDSCAPE CHARACTERISTICS --- #
 
 # INSERT
+
 
 
 # ============================================================================ # 
