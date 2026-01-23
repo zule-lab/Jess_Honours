@@ -13,10 +13,9 @@ library(tidyverse)
 
 # PROBLEMS I am currently having:
 # *area: how do I get the conversion to Kayleigh's yards?
-# **yards: Y50 is missing from the tree dataset, Y25 is missing from centroid data
+# **yards: Y50 is missing from the tree data, Y25 is missing from centroid data
 # ***trees/shrubs: is the best way to differentiate them by stem number?
 # ****dbh: should i include shrubs in average DBH?
-# *****big: what should the threshold for big trees be?
 # ******fruit: what are the fruiting species?
 
 # ============================================================================ # 
