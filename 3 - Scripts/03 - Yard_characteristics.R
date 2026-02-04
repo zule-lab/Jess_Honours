@@ -13,12 +13,14 @@ library(tidyverse)
 
 # PROBLEMS I am currently having:
 # **yards: Y50 is missing from the tree data
-# ***trees/shrubs: is the best way to differentiate them by stem number?
+
 
 # ============================================================================ # 
 # 1. YARD MEASUREMENTS
 # ============================================================================ # 
+
 # --- 1.1 CENTROID POINTS --- #
+
 # DEF: Find the middle-most point in each backyard in decimal degrees and UTM. 
 # (Note: front yards were not considered in this calculation because this would 
 # complicate the scaled calculations of yard features and so few of the 
@@ -30,7 +32,7 @@ library(tidyverse)
     # (also calculated shortest and longest radii from the centroid within the yard)
 
 # Import data here:
-centroid_data <- read_csv("~/Desktop/Jess_Honours/1 - Input/centroid_data.csv")
+centroid_data <- read_csv("2 - Cleaned/centroid_data.csv")
 # remove extra rows and columns that appeared in import
 centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_data), 
                                colSums(is.na(centroid_data)) != nrow(centroid_data)]
@@ -38,6 +40,7 @@ centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_da
 
 
 # --- 1.2 AREA ** --- #
+
 # DEF: Backyard area calculated using Google Maps' Polygon Tool by visually drawing 
 # quadrilateral around yard, and total yard area (front yard included) from
 # Kayleigh's work.
@@ -52,13 +55,14 @@ back_area <- subset(centroid_data, select = c(Yard.Code, area, back_area_ha))
 ##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
 
 # --- 2.1 NUMBER OF TREES AND SHRUBS PER YARD --- # ** ***
+
 # DEF: Count the number of trees and shrubs in yards from yard_trees_verified
 # I differentiated between trees and shrubs based on species, size, and stem number.
 # In particular, SYVU was defined as a tree if its DBH > 10 and stem = 1, and 
 # THOC was defined as a tree if DBH > 20 and stem = 1. 
 
 # Import yard_trees_verified:
-yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
+yard_trees_verified <- read_csv("2 - Cleaned/yard_trees_verified.csv")
 
 # Write and use function that counts number of trees and shrubs in each yard
 count_trees_shrubs <- function(plant_df) {
@@ -79,6 +83,7 @@ tree_shrub_count <- count_trees_shrubs(yard_trees_verified)
 
 
 # --- 2.2 TREE AND SHRUB DENSITY --- #
+
 # DEF: Calculated the density of vegetation (tree + shrubs) in backyards based on 
 # their area.
 
@@ -102,6 +107,7 @@ density_df <- density_df %>%
 
 
 # --- 2.3 AVERAGE DBH --- # ** ****
+
 # DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
 # the DBHs in yard_trees_verified
 
@@ -128,6 +134,7 @@ mean_DBH_df <- mean_dbh_by_yard(yard_trees_verified)
 
 
 # --- 2.4 NUMBER OF FRUITING PLANTS--- # ******
+
 # DEF: Calculate the number of fruiting plants in each yard.
 # Information gathered from "Manual of Woody Landscape Plants" by Michael A. Dirr
 # Plants are considered fruiting if they produce fleshy fruit during spring or summer
@@ -153,6 +160,7 @@ fruiting_df <- fruiting_count_by_yard(yard_trees_verified)
 
 
 # --- 2.5 NATIVITY--- #
+
 # DEF: Calculate the number of native tree and shrub species are in each yard.
 native_count_by_yard <- function(plant_df){
   plant_df %>%
@@ -170,11 +178,12 @@ native_df <- native_count_by_yard(yard_trees_verified)
 # ============================================================================ # 
 # 3. BIRD SPECIES RICHNESS
 # ============================================================================ # 
+
 # DEF: Take the bird species richness measures for each yard calculated in SR.R 
 # script and stored in "SR_long.csv" and convert them to a wide data frame.
 
 # Import SR_long.csv for species richnesses
-SR_long <- read_csv("4 - Outputs/SR_long.csv")
+SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
 # Convert into a wide data frame with the datasets as the columns and yards as rows
 richness_wide <- SR_long %>%
@@ -202,6 +211,7 @@ richness_wide <- richness_wide %>%
 # ============================================================================ # 
 # 4. WRITE & EXPORT
 # ============================================================================ # 
+
 # Def: write and export yard_characteristics.csv by binding the following data 
 # frames by yard codes:
   # centroid & area: centroid_data
@@ -227,8 +237,7 @@ yard_characteristics <- Reduce(
 )
 
 # Export yard_characteristics data frame
-write.csv(yard_characteristics, file="yard_characteristics.csv", row.names=FALSE)
-  # Moved to "4 - Outputs" directory
+write.csv(yard_characteristics, file="2 - Cleaned/yard_characteristics.csv", row.names=FALSE)
 
 
 

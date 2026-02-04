@@ -32,18 +32,22 @@ n_total = num_observations(cleaned_yard_data)
 
 # 1.12 Migration
 cleaned_migratory_data_2024 <- read_csv("2 - Cleaned/cleaned_migratory_data_2024.csv")
-cleaned_migratory_data_2025 <- read_csv("2 - Cleaned/cleaned_migratory_data_2025.csv")
-cleaned_migratory_data <- read_csv("2 - Cleaned/cleaned_migratory_data.csv")
 n_mig24 = num_observations(cleaned_migratory_data_2024)
+
+cleaned_migratory_data_2025 <- read_csv("2 - Cleaned/cleaned_migratory_data_2025.csv")
 n_mig25 = num_observations(cleaned_migratory_data_2025)
+
+cleaned_migratory_data <- read_csv("2 - Cleaned/cleaned_migratory_data.csv")
 n_mig = num_observations(cleaned_migratory_data)
 
 # 1.13 Breeding
 cleaned_breeding_data_2024 <- read_csv("2 - Cleaned/cleaned_breeding_data_2024.csv")
-cleaned_breeding_data_2025 <- read_csv("2 - Cleaned/cleaned_breeding_data_2025.csv")
-cleaned_breeding_data <- read_csv("2 - Cleaned/cleaned_breeding_data.csv")
 n_bre24 = num_observations(cleaned_breeding_data_2024)
+
+cleaned_breeding_data_2025 <- read_csv("2 - Cleaned/cleaned_breeding_data_2025.csv")
 n_bre25 = num_observations(cleaned_breeding_data_2025)
+
+cleaned_breeding_data <- read_csv("2 - Cleaned/cleaned_breeding_data.csv")
 n_bre = num_observations(cleaned_breeding_data)
 
 
@@ -58,14 +62,14 @@ SR <- function(yard_wide){
 }
 
 # 1.21 Total
-total_yard_wide <- read_csv("4 - Outputs/SR matrices/total_yard_wide.csv")
+total_yard_wide <- read_csv("2 - Cleaned/SR matrices/total_yard_wide.csv")
 SR_total = SR(total_yard_wide)
 print(SR_total)
 
 # 1.22 Migration
-m24_yard_wide <- read_csv("4 - Outputs/SR matrices/m24_yard_wide.csv")
-m25_yard_wide <- read_csv("4 - Outputs/SR matrices/m25_yard_wide.csv")
-m_yard_wide <- read_csv("4 - Outputs/SR matrices/m_yard_wide.csv")
+m24_yard_wide <- read_csv("2 - Cleaned/SR matrices/m24_yard_wide.csv")
+m25_yard_wide <- read_csv("2 - Cleaned/SR matrices/m25_yard_wide.csv")
+m_yard_wide <- read_csv("2 - Cleaned/SR matrices/m_yard_wide.csv")
 SR_mig24 = SR(m24_yard_wide)
 print(SR_mig24)
 SR_mig25 = SR(m25_yard_wide)
@@ -74,9 +78,9 @@ SR_mig = SR(m_yard_wide)
 print(SR_mig)
 
 # 1.23 Breeding
-b24_yard_wide <- read_csv("4 - Outputs/SR matrices/b24_yard_wide.csv")
-b25_yard_wide <- read_csv("4 - Outputs/SR matrices/b25_yard_wide.csv")
-b_yard_wide <- read_csv("4 - Outputs/SR matrices/b_yard_wide.csv")
+b24_yard_wide <- read_csv("2 - Cleaned/SR matrices/b24_yard_wide.csv")
+b25_yard_wide <- read_csv("2 - Cleaned/SR matrices/b25_yard_wide.csv")
+b_yard_wide <- read_csv("2 - Cleaned/SR matrices/b_yard_wide.csv")
 SR_bre24 = SR(b24_yard_wide)
 print(SR_bre24)
 SR_bre25 = SR(b25_yard_wide)
@@ -95,7 +99,7 @@ avgSR_yard <- function(long_df,season){
   return(avg_SR)
 }
 
-SR_long <- read_csv("4 - Outputs/SR_long.csv")
+SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
 # 1.31 Total
 avgSR_yard_total = avgSR_yard(SR_long, season="total")
@@ -130,21 +134,21 @@ avgSR_visit <- function(visit_wide) {
 }
 
 # 1.41 Total
-total_visit_wide <- read_csv("4 - Outputs/SR matrices/total_visit_wide.csv")
+total_visit_wide <- read_csv("2 - Cleaned/SR matrices/total_visit_wide.csv")
 avgSR_visit_total = avgSR_visit(total_visit_wide)
 
 # 1.42 Migration
-m24_visit_wide <- read_csv("4 - Outputs/SR matrices/m24_visit_wide.csv")
-m25_visit_wide <- read_csv("4 - Outputs/SR matrices/m25_visit_wide.csv")
-m_visit_wide <- read_csv("4 - Outputs/SR matrices/m_visit_wide.csv")
+m24_visit_wide <- read_csv("2 - Cleaned/SR matrices/m24_visit_wide.csv")
+m25_visit_wide <- read_csv("2 - Cleaned/SR matrices/m25_visit_wide.csv")
+m_visit_wide <- read_csv("2 - Cleaned/SR matrices/m_visit_wide.csv")
 avgSR_visit_mig24 = avgSR_visit(m24_visit_wide)
 avgSR_visit_mig25 = avgSR_visit(m25_visit_wide)
 avgSR_visit_mig = avgSR_visit(m_visit_wide)
 
 # 1.43 Breeding
-b24_visit_wide <- read_csv("4 - Outputs/SR matrices/b24_visit_wide.csv")
-b25_visit_wide <- read_csv("4 - Outputs/SR matrices/b25_visit_wide.csv")
-b_visit_wide <- read_csv("4 - Outputs/SR matrices/b_visit_wide.csv")
+b24_visit_wide <- read_csv("2 - Cleaned/SR matrices/b24_visit_wide.csv")
+b25_visit_wide <- read_csv("2 - Cleaned/SR matrices/b25_visit_wide.csv")
+b_visit_wide <- read_csv("2 - Cleaned/SR matrices/b_visit_wide.csv")
 avgSR_visit_bre24 = avgSR_visit(b24_visit_wide)
 avgSR_visit_bre25 = avgSR_visit(b25_visit_wide)
 avgSR_visit_bre = avgSR_visit(b_visit_wide)
@@ -226,7 +230,7 @@ species_pres_by_seasons <- data.frame(
       # •	Number of fruiting plants
 
 # Import data
-yard_characteristics <- read_csv("4 - Outputs/yard_characteristics.csv")
+yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 
 # Select only relevant columns from yard_characteristics
 yard_features <- yard_characteristics %>% 
@@ -249,7 +253,7 @@ summary_yard_features <- as.data.frame( # return data frame, not matrix
 # 3.21 Find abundance of plant species in yards
 
 # Import data
-yard_trees_verified <- read_csv("1 - Input/yard_trees_verified.csv")
+yard_trees_verified <- read_csv("2 - Cleaned/yard_trees_verified.csv")
 
 # Abundance of plant species by counting frequency of species code
 species_abundance <- yard_trees_verified %>%

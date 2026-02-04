@@ -21,7 +21,7 @@ library(corrplot)
 
 # 1.11 Prepare yard_characteristics to include only yard habitat features
 # Import data
-yard_characteristics <- read_csv("4 - Outputs/yard_characteristics.csv")
+yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 
 # Remove yard ID, centroid data, and SR columns
 yard_features_only <- select(yard_characteristics, 

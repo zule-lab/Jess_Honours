@@ -2,6 +2,7 @@
 # ============================================================================ # 
 #                          SPECIES RICHNESS DATA FRAMES
 # ============================================================================ # 
+
 # DESCRIPTION: 
 # Extraction of species richness (SR) data from cleaned observation data
 # (cleaned_yard_data.csv, cleaned_migratory_data.csv, cleaned_breeding_data.csv)
@@ -14,13 +15,16 @@ library(readr)
 library(tidyverse)
 
 # Import cleaned observation data frames:
-total <- read_csv("cleaned_yard_data.csv")
-migratory_2024 <- read_csv("cleaned_migratory_data_2024.csv")
-migratory_2025 <- read_csv("cleaned_migratory_data_2025.csv")
-migratory <- read_csv("cleaned_migratory_data.csv")
-breeding_2024 <- read_csv("cleaned_breeding_data_2024.csv")
-breeding_2025 <- read_csv("cleaned_breeding_data_2025.csv")
-breeding <- read_csv("cleaned_breeding_data.csv")
+total <- read_csv("2 - Cleaned/cleaned_yard_data.csv")
+migratory_2024 <- read_csv("2 - Cleaned/cleaned_migratory_data_2024.csv")
+migratory_2025 <- read_csv("2 - Cleaned/cleaned_migratory_data_2025.csv")
+migratory <- read_csv("2 - Cleaned/cleaned_migratory_data.csv")
+breeding_2024 <- read_csv("2 - Cleaned/cleaned_breeding_data_2024.csv")
+breeding_2025 <- read_csv("2 - Cleaned/cleaned_breeding_data_2025.csv")
+breeding <- read_csv("2 - Cleaned/cleaned_breeding_data.csv")
+
+
+
 
 # ============================================================================ # 
 # 1. PRESENCE-ABSENCE MATRICES (WIDE DATA FRAMES)
@@ -40,11 +44,13 @@ breeding <- read_csv("cleaned_breeding_data.csv")
 # All wide data frames will have the following columns: yard, date, species_1, 
 # species_2...etc. 
 
+
+
 # --- 1.1 TOTAL --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.11 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 total_visit_pa <- total %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -62,11 +68,11 @@ total_visit_wide <- total_visit_pa %>%
   )
 
 # Export
-write.csv(total_visit_wide, file="total_visit_wide.csv", row.names=FALSE)
+write.csv(total_visit_wide, file="2 - Cleaned/SR matrices/total_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.12 Yards
 # Collapse all visits together so that there is one row per yard. 
 total_yard_wide <- total %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -79,15 +85,16 @@ total_yard_wide <- total %>%
   )
 
 # Export
-write.csv(total_yard_wide, file="total_yard_wide.csv", row.names=FALSE)
+write.csv(total_yard_wide, file="2 - Cleaned/SR matrices/total_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # --- 1.2 MIGRATORY_2024 --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.21 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 m24_visit_pa <- migratory_2024 %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -105,11 +112,11 @@ m24_visit_wide <- m24_visit_pa %>%
   )
 
 # Export
-write.csv(m24_visit_wide, file="m24_visit_wide.csv", row.names=FALSE)
+write.csv(m24_visit_wide, file="2 - Cleaned/SR matrices/m24_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.22 Yards
 # Collapse all visits together so that there is one row per yard. 
 m24_yard_wide <- migratory_2024 %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -122,15 +129,16 @@ m24_yard_wide <- migratory_2024 %>%
   )
 
 # Export
-write.csv(m24_yard_wide, file="m24_yard_wide.csv", row.names=FALSE)
+write.csv(m24_yard_wide, file="2 - Cleaned/SR matrices/m24_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # --- 1.3 MIGRATORY_2025 --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.31 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 m25_visit_pa <- migratory_2025 %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -148,11 +156,11 @@ m25_visit_wide <- m25_visit_pa %>%
   )
 
 # Export
-write.csv(m25_visit_wide, file="m25_visit_wide.csv", row.names=FALSE)
+write.csv(m25_visit_wide, file="2 - Cleaned/SR matrices/m25_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.32 Yards
 # Collapse all visits together so that there is one row per yard. 
 m25_yard_wide <- migratory_2025 %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -165,15 +173,16 @@ m25_yard_wide <- migratory_2025 %>%
   )
 
 # Export
-write.csv(m25_yard_wide, file="m25_yard_wide.csv", row.names=FALSE)
+write.csv(m25_yard_wide, file="2 - Cleaned/SR matrices/m25_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # --- 1.4 MIGRATORY --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.41 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 m_visit_pa <- migratory %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -191,11 +200,11 @@ m_visit_wide <- m_visit_pa %>%
   )
 
 # Export
-write.csv(m_visit_wide, file="m_visit_wide.csv", row.names=FALSE)
+write.csv(m_visit_wide, file="2 - Cleaned/SR matrices/m_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.42 Yards
 # Collapse all visits together so that there is one row per yard. 
 m_yard_wide <- migratory %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -208,7 +217,7 @@ m_yard_wide <- migratory %>%
   )
 
 # Export
-write.csv(m_yard_wide, file="m_yard_wide.csv", row.names=FALSE)
+write.csv(m_yard_wide, file="2 - Cleaned/SR matrices/m_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
@@ -217,7 +226,7 @@ write.csv(m_yard_wide, file="m_yard_wide.csv", row.names=FALSE)
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.51 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 b24_visit_pa <- breeding_2024 %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -235,11 +244,11 @@ b24_visit_wide <- b24_visit_pa %>%
   )
 
 # Export
-write.csv(b24_visit_wide, file="b24_visit_wide.csv", row.names=FALSE)
+write.csv(b24_visit_wide, file="2 - Cleaned/SR matrices/b24_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.52 Yards
 # Collapse all visits together so that there is one row per yard. 
 b24_yard_wide <- breeding_2024 %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -252,15 +261,16 @@ b24_yard_wide <- breeding_2024 %>%
   )
 
 # Export
-write.csv(b24_yard_wide, file="b24_yard_wide.csv", row.names=FALSE)
+write.csv(b24_yard_wide, file="2 - Cleaned/SR matrices/b24_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # --- 1.6 BREEDING_2025 --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.61 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 b25_visit_pa <- breeding_2025 %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -278,11 +288,11 @@ b25_visit_wide <- b25_visit_pa %>%
   )
 
 # Export
-write.csv(b25_visit_wide, file="b25_visit_wide.csv", row.names=FALSE)
+write.csv(b25_visit_wide, file="2 - Cleaned/SR matrices/b25_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.62 Yards
 # Collapse all visits together so that there is one row per yard. 
 b25_yard_wide <- breeding_2025 %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -295,7 +305,7 @@ b25_yard_wide <- breeding_2025 %>%
   )
 
 # Export
-write.csv(b25_yard_wide, file="b25_yard_wide.csv", row.names=FALSE)
+write.csv(b25_yard_wide, file="2 - Cleaned/SR matrices/b25_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
@@ -303,11 +313,11 @@ write.csv(b25_yard_wide, file="b25_yard_wide.csv", row.names=FALSE)
 
 
 
-# --- 1.6 BREEDING --- ####
+# --- 1.7 BREEDING --- ####
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
-# a. Visits
+# 1.71 Visits
 # Create a yard visit ID and reduce to data frame to presence.
 b_visit_pa <- breeding %>%  # pa for presence-absence
   mutate(Date = as.Date(Date)) %>%  # ensure Date is Date class
@@ -325,11 +335,11 @@ b_visit_wide <- b_visit_pa %>%
   )
 
 # Export
-write.csv(b_visit_wide, file="b_visit_wide.csv", row.names=FALSE)
+write.csv(b_visit_wide, file="2 - Cleaned/SR matrices/b_visit_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
-# b. Yards
+# 1.72 Yards
 # Collapse all visits together so that there is one row per yard. 
 b_yard_wide <- breeding %>%
   distinct(Code, Bird.code) %>%  # species ever seen in each yard
@@ -342,7 +352,7 @@ b_yard_wide <- breeding %>%
   )
 
 # Export
-write.csv(b_yard_wide, file="b_yard_wide.csv", row.names=FALSE)
+write.csv(b_yard_wide, file="2 - Cleaned/SR matrices/b_yard_wide.csv", row.names=FALSE)
 # moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
@@ -396,6 +406,6 @@ SR_long <- bind_rows(
 )
 
 # 2.4 Export Wide SR Presence-Absence Matrices
-write.csv(SR_long, file="SR_long.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output
+write.csv(SR_long, file="2 - Cleaned/SR_long.csv", row.names=FALSE)
+
 

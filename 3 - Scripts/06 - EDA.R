@@ -20,14 +20,15 @@ library(tidyverse)
 
 # --- 1.1 SPECIES RICHNESS ACROSS YARDS --- #
 
-yard_characteristics <- read_csv("4 - Outputs/yard_characteristics.csv")
-SR_long <- read_csv("4 - Outputs/SR_long.csv")
+yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
+SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
 
 # 1.11 All SR data
 # boxplot of SR for each season
 ggplot(data = SR_long) + 
-  geom_boxplot(mapping = aes(x = dataset, y=richness, fill = dataset)) 
+  geom_boxplot(mapping = aes(x = dataset, y=richness, fill = dataset)) + 
+  theme_bw()
 
 # histogram of SR for each season
 ggplot(data = SR_long) + geom_histogram(mapping = aes(x=richness)) + 
@@ -187,8 +188,7 @@ yard_characteristics_long <- yard_characteristics %>%
   )
 
 # Export yard_characteristics_long data frame
-write.csv(yard_characteristics_long, file="yard_characteristics_long.csv", row.names=FALSE)
-  # Moved to "4 - Outputs" directory
+write.csv(yard_characteristics_long, file="2 - Cleaned/yard_characteristics_long.csv", row.names=FALSE)
 
 
 # 2.12 SR ~ Area
@@ -258,12 +258,12 @@ ggplot(data = yard_characteristics_long) +
 
 
 # --- 2.2. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# Linear ggplot relationships
+# ggplot relationships
 
 
 
 # --- 2.3. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# Linear ggplot relationships
+# ggplot relationships
 
 
 
