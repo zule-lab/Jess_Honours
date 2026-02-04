@@ -153,11 +153,10 @@ fruiting_df <- fruiting_count_by_yard(yard_trees_verified)
 
 
 # --- 2.5 NATIVITY--- #
-# DEF: Calculate the number of native tree and shrub species are in each ayrd.
+# DEF: Calculate the number of native tree and shrub species are in each yard.
 native_count_by_yard <- function(plant_df){
   plant_df %>%
-    mutate(
-      is_native = Native == "yes") %>%
+    mutate(is_native = Native == "yes") %>%
     group_by(Yard.Code) %>%
     summarise(
       n_native_plants = sum(is_native, na.rm = TRUE),
@@ -213,6 +212,7 @@ richness_wide <- richness_wide %>%
   # number of fruiting plants: fruiting_count_by_yard
   # bird SR across seasons: richness_wide
 
+# Create yard_characteristics data frame
 yard_characteristics <- Reduce(
   function(x, y) full_join(x, y, by = "Yard.Code"),
   list(
@@ -229,5 +229,7 @@ yard_characteristics <- Reduce(
 # Export yard_characteristics data frame
 write.csv(yard_characteristics, file="yard_characteristics.csv", row.names=FALSE)
   # Moved to "4 - Outputs" directory
+
+
 
 
