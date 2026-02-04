@@ -45,7 +45,3 @@ corrplot(cor_matrix_yard) # visual correlation matrix
 # --- 2.1 CORRELATION MATRIX --- #
 
 #cor_matrix_landscape
-
-
-
-
