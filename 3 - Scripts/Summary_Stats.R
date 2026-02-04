@@ -1,10 +1,11 @@
-# 18-Jan-2026                          
+# 03-Feb-2026                          
 # ============================================================================ # 
-#                          EXPLORATION DATA ANALYSIS
+#                          SUMMARY STATISTICS
 # ============================================================================ # 
 
 # DESCRIPTION: 
-# Exploration of data and trends in data.
+# Calculation of summary statistics for bird species richness, yard habitat 
+# features, and landscape habitat features.
 
 # PACKAGES USED:
 library(readr)
@@ -82,6 +83,7 @@ SR_bre25 = SR(b25_yard_wide)
 print(SR_bre25)
 SR_bre = SR(b_yard_wide)
 print(SR_bre)
+
 
 
 # --- 1.3 AVERAGE SPECIES RICHNESS PER YARD --- #
@@ -173,14 +175,13 @@ standardize <- function(df, species_list){
   return(df)
 }
 
-# Standardize every season to have all 44 species
+# Standardize every season to have all 44 species and remove Code column
 m24_standardized = standardize(m24_yard_wide,bird_code_list)
 m25_standardized = standardize(m25_yard_wide,bird_code_list)
 b24_standardized = standardize(b24_yard_wide,bird_code_list)
 b25_standardized = standardize(b25_yard_wide,bird_code_list)
 
 # Find species present for each season
-total_pres <- as.integer(colSums(total_pres_abs) > 0)
 m24_pres <- as.integer(colSums(m24_standardized) > 0)
 m25_pres <- as.integer(colSums(m25_standardized) > 0)
 b24_pres <- as.integer(colSums(b24_standardized) > 0)
@@ -225,16 +226,15 @@ species_pres_by_seasons <- data.frame(
       # •	Number of fruiting plants
 
 # Import data
-yard_characteristics <- read_csv("4 - Output/yard_characteristics.csv") #not there yet
+yard_characteristics <- read_csv("4 - Outputs/yard_characteristics.csv")
 
 # Select only relevant columns from yard_characteristics
 yard_features <- yard_characteristics %>% 
-  select(back_area_ha,shrub_count,tree_count,shrub_density,tree_density,
-         mean_dbh_all,mean_dbh_shrub,mean_dbh_tree,n_fruiting_plants)
+  select(area,back_area_ha,shrub,tree,density,mean_dbh,n_fruiting_plants,n_native_plants)
 
 # Calculate n, mean, SD, and range for yard features and create new data frame
 summary_yard_features <- as.data.frame( # return data frame, not matrix
-  rbind( # count non-NA observations for n, and remove NA observations for each variable
+  rbind( # count non-NA observations for n, and remove NA observations for each variable+
     n    = colSums(!is.na(yard_features)), # count number of valid observations
     mean = apply(yard_features, 2, function(x) mean(x, na.rm = TRUE)), 
     sd   = apply(yard_features, 2, function(x) sd(x, na.rm = TRUE)), 
@@ -242,6 +242,7 @@ summary_yard_features <- as.data.frame( # return data frame, not matrix
     max  = apply(yard_features, 2, function(x) max(x, na.rm = TRUE)) 
   )
 )
+
 
 
 # --- 3.2 PLANT SPECIES --- #
@@ -296,7 +297,7 @@ ggplot(species_abundance,
 # LANDSCAPE HABITAT FEATURES  
 # ============================================================================ # 
 
-# --- 6. insert --- #
+# --- 4. insert --- #
 
 
 
@@ -304,85 +305,6 @@ ggplot(species_abundance,
 
 
 
-# ============================================================================ # 
-# DISTRIBUTION OF VARIABLES  
-# ============================================================================ # 
-
-# --- X. SPECIES RICHNESS --- #
-
-# X.1 Migration
-# 2024
-
-# 2025
-
-# Both
-
-
-# X.2 Breeding
-# 2024
-
-# 2025
-
-# Both
-
-
-# --- X. YARD CHARACTERISTICS --- #
-yard_characteristics <- read_csv("yard_characteristics.csv")
-# X.1 Area
-
-
-# X.2 Number of trees
-
-
-# X.3 Number of shrubs
-
-
-# X.4 Tree density
-
-
-# X.5 Shrub density
-
-
-# X.6 Average DBH
-
-
-# X.7 Number of fruiting plants
-
-
-
-# --- X. LANDSCAPE CHARACTERISTICS --- #
-
-# INSERT
-
-
-
-# ============================================================================ # 
-# RELATIONSHIPS TO SPECIES RICHNESS
-# ============================================================================ # 
-
-# --- X. SR ~ YARD HABITAT FEATURES --- #
-# Linear ggplot relationships
-
-
-# --- X. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# Linear ggplot relationships
-
-
-
-# --- X. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# Linear ggplot relationships
-
-
-
-
-# ============================================================================ # 
-# TESTS
-# ============================================================================ # 
-
-
-###### TESTS FOR NORMALITY
-
-###### TESTS FOR COLLINEARITY
 
 
 

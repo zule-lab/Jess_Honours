@@ -1,4 +1,4 @@
-# 07-Jan-2026
+# 03-Feb-2026
 # ============================================================================ # 
 #                        YARD CHARACTERISTIC DATA FRAME
 # ============================================================================ # 
@@ -58,7 +58,7 @@ back_area <- subset(centroid_data, select = c(Yard.Code, area, back_area_ha))
 # THOC was defined as a tree if DBH > 20 and stem = 1. 
 
 # Import yard_trees_verified:
-yard_plants_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
+yard_trees_verified <- read_csv("~/Desktop/Jess_Honours/1 - Input/yard_trees_verified.csv")
 
 # Write and use function that counts number of trees and shrubs in each yard
 count_trees_shrubs <- function(plant_df) {
@@ -74,7 +74,7 @@ count_trees_shrubs <- function(plant_df) {
       values_fill = 0 # inserts 0 if there's no trees/shrubs
     )
 }
-tree_shrub_count <- count_trees_shrubs(yard_plants_verified)
+tree_shrub_count <- count_trees_shrubs(yard_trees_verified)
 
 
 
@@ -103,7 +103,7 @@ density_df <- density_df %>%
 
 # --- 2.3 AVERAGE DBH --- # ** ****
 # DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
-# the DBHs in yard_plants_verified
+# the DBHs in yard_trees_verified
 
 # Function that finds DBH of trees, shrubs, and all plants from data frame
 mean_dbh_by_yard <- function(plant_df) {
@@ -123,7 +123,7 @@ mean_dbh_by_yard <- function(plant_df) {
       .groups="drop"
     )
 }
-mean_DBH_df <- mean_dbh_by_yard(yard_plants_verified)
+mean_DBH_df <- mean_dbh_by_yard(yard_trees_verified)
 
 
 
@@ -132,8 +132,8 @@ mean_DBH_df <- mean_dbh_by_yard(yard_plants_verified)
 # Information gathered from "Manual of Woody Landscape Plants" by Michael A. Dirr
 # Plants are considered fruiting if they produce fleshy fruit during spring or summer
 
-# Using the species listed in yard_plants_verified, determine which species are fruiting:
-unique(yard_plants_verified$Plant.sci) # get list of species
+# Using the species listed in yard_trees_verified, determine which species are fruiting:
+unique(yard_trees_verified$Plant.sci) # get list of species
 
 # Create function that counts fruiting plants in each season and overall per yard
 fruiting_count_by_yard <- function(plant_df){
@@ -148,8 +148,23 @@ fruiting_count_by_yard <- function(plant_df){
       .groups = "drop"
     )
 }
-fruiting_df <- fruiting_count_by_yard(yard_plants_verified)
+fruiting_df <- fruiting_count_by_yard(yard_trees_verified)
 
+
+
+# --- 2.5 NATIVITY--- #
+# DEF: Calculate the number of native tree and shrub species are in each ayrd.
+native_count_by_yard <- function(plant_df){
+  plant_df %>%
+    mutate(
+      is_native = Native == "yes") %>%
+    group_by(Yard.Code) %>%
+    summarise(
+      n_native_plants = sum(is_native, na.rm = TRUE),
+      .groups = "drop"
+    )
+}
+native_df <- native_count_by_yard(yard_trees_verified)
 
 
 
@@ -206,55 +221,13 @@ yard_characteristics <- Reduce(
     density_df,
     mean_DBH_df,
     fruiting_df,
+    native_df,
     richness_wide
   )
 )
 
 # Export yard_characteristics data frame
 write.csv(yard_characteristics, file="yard_characteristics.csv", row.names=FALSE)
-# Moved to "4 - Outputs" directory
+  # Moved to "4 - Outputs" directory
 
 
-
-
-
-
-
-# not used
-##### 6. NUMBER OF BIG TREES ** *** ***** #####
-# DEF: Find the number of trees in yard_plants_verified with a DBH greater than 
-# a threshold. 
-
-#Threshold determined based on avian ecology (30-60cm)
-# https://link-springer-com.proxy3.library.mcgill.ca/article/10.1007/s11676-024-01714-w#:~:text=Based%20on%20decision%20tree%20modelling,trees%20over%2010%20cm%20DBH.
-# "We wanted the model to reﬂectthe mean diameter of the cavity limb (21.6 cm; Jackson, 1976)so only included trees greater than 23 cm dbh and adjusted the densities to reﬂect these conditions"
-# From: https://www-sciencedirect-com.proxy3.library.mcgill.ca/science/article/pii/S0169204613002077?via%3Dihub
-
-# Subset yard_plants_verified to include only trees (i.e., 1 stem)
-yard_trees_verified <- yard_plants_verified[yard_plants_verified$Number.stems == 1,]
-
-# Examine distribution of DBH values
-summary(yard_trees_verified) 
-# extract mean, median, 1st and 3rd quartiles
-mean_val = 21.04
-median_val = 14.50
-first_val = 8.00
-third_val = 27.25
-# plot histgram
-ggplot(data = yard_trees_verified, aes(x = DBH)) +
-  geom_histogram(binwidth = 2) +  
-  geom_vline(aes(xintercept = mean_val), color = "red", linetype = "solid", size = 0.5) + 
-  geom_vline(aes(xintercept = median_val), color = "blue", linetype = "solid", size = 0.5) + 
-  geom_vline(aes(xintercept = first_val), color = "purple", linetype = "solid", size = 0.5) + 
-  geom_vline(aes(xintercept = third_val), color = "purple", linetype = "solid", size = 0.5) + 
-  theme_bw()
-# threshold will be 45 because that is generally considered big tree
-
-
-# Find number of trees with DBH greater than X in each yard:
-count_big_trees <- yard_trees_verified %>%
-  group_by(Yard.Code) %>%
-  summarise(
-    n_big_trees = sum(DBH > 45, na.rm = TRUE), # threshold is 45
-    .groups = "drop"
-  )
