@@ -222,7 +222,7 @@ ggplot(data = yard_characteristics_long) +
   labs(x = "Number of shrubs", y = "Species richness")
 
 
-# 2.15 SR ~ Density of vegetation
+ii# 2.15 SR ~ Density of vegetation
 ggplot(data = yard_characteristics_long) + 
   geom_point(mapping = aes(x = density, y = richness)) + 
   theme_bw() +

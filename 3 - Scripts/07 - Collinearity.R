@@ -36,6 +36,7 @@ cor_matrix_yard
 
 corrplot(cor_matrix_yard) # visual correlation matrix
 
+# Conclusions: should remove back_area_ha (which I already planned to) and density
 
 
 # ============================================================================ # 
