@@ -192,7 +192,7 @@ yard_characteristics_long <- yard_characteristics %>%
 write.csv(yard_characteristics_long, file="2 - Cleaned/yard_characteristics_long.csv", row.names=FALSE)
 
 
-# 2.12 SR ~ Area
+ # 2.12 SR ~ Area
 ggplot(data = yard_characteristics_long) + 
   geom_point(mapping = aes(x = area, y = richness)) + 
   theme_bw() +

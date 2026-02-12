@@ -26,7 +26,7 @@ yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 # Remove yard ID, centroid data, and SR columns
 yard_features_only <- select(yard_characteristics, 
                                 c(area,tree,shrub,density,mean_dbh,
-                                  n_fruiting_plants,proportion_native))
+                                  proportion_fruit,proportion_native))
 
 
 # 1.12 Create correlation matrices
