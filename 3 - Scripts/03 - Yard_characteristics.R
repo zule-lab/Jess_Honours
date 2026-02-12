@@ -41,10 +41,11 @@ centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_da
 
 # --- 1.2 AREA ** --- #
 
-# DEF: Backyard area calculated using Google Maps' Polygon Tool by visually drawing 
-# quadrilateral around yard, and total yard area (front yard included) from
-# Kayleigh's work.
-back_area <- subset(centroid_data, select = c(Yard.Code, area, back_area_ha))
+# DEF: Total yard area (front and backyards) from Kayleigh Hutt-Taylor's work, 
+# included in centroid data. 
+# Convert area from hectares to square meters
+centroid_data$area <- centroid_data$area*10000
+
 
 
 
@@ -64,21 +65,20 @@ back_area <- subset(centroid_data, select = c(Yard.Code, area, back_area_ha))
 # Import yard_trees_verified:
 yard_trees_verified <- read_csv("2 - Cleaned/yard_trees_verified.csv")
 
-# Write and use function that counts number of trees and shrubs in each yard
-count_trees_shrubs <- function(plant_df) {
-  plant_df %>%
-    # treat each combination of yard and plant type as its own group
-    group_by(Yard.Code, Type) %>%
-    # collapse each group into one row
-    summarise(n = n(), .groups = "drop") %>% # n: row count, "drop" removes grouping structure
-    # reshape to yard-level
-    pivot_wider(
-      names_from  = Type, # becomes column names
-      values_from = n, # fills column with n values
-      values_fill = 0 # inserts 0 if there's no trees/shrubs
-    )
-}
-tree_shrub_count <- count_trees_shrubs(yard_trees_verified)
+# Create data frame of number of trees and shrubs in each yard
+tree_shrub_count <- yard_trees_verified %>%
+  # treat each combination of yard and plant type as its own group
+  group_by(Yard.Code, Type) %>%
+  # collapse each group into one row
+  summarise(n = n(), .groups = "drop") %>% # n: row count, "drop" removes grouping structure
+  # reshape to yard-level
+  pivot_wider(
+    names_from  = Type, # becomes column names
+    values_from = n, # fills column with n values
+    values_fill = 0 # inserts 0 if there's no trees/shrubs
+  )
+
+
 
 
 
@@ -87,22 +87,13 @@ tree_shrub_count <- count_trees_shrubs(yard_trees_verified)
 # DEF: Calculated the density of vegetation (tree + shrubs) in backyards based on 
 # their area.
 
-# Join back_area with tree_shrub_count for density calculation
-area_and_veg_df <- back_area %>%
-  left_join(tree_shrub_count, by = c("Yard.Code" = "Yard.Code"))
+# Join area with tree_shrub_count for density calculation
+density_df <- centroid_data %>%
+  select(Yard.Code, area) %>%
+  left_join(tree_shrub_count, by = c("Yard.Code" = "Yard.Code")) %>%
+  mutate(density = (tree + shrub) / area) %>%
+  select(-area, -tree, -shrub)
 
-# Write & use function to calculate density (count/area)
-calc_density <- function(data, area_col=area) {
-  data %>%
-    mutate(
-      density = (tree + shrub) / {{ area_col }}
-    )
-}
-density_df <- calc_density(area_and_veg_df, area_col=area)
-
-# Remove the back_area_ha, shrub, and tree columns
-density_df <- density_df %>%
-  select(-back_area_ha, -tree, -shrub, -area)
 
 
 
@@ -111,67 +102,61 @@ density_df <- density_df %>%
 # DEF: Find the average DBH for trees, shrubs, and all plants in each yard from 
 # the DBHs in yard_trees_verified
 
-# Function that finds DBH of trees, shrubs, and all plants from data frame
-mean_dbh_by_yard <- function(plant_df) {
-  plant_df %>%
-    mutate(
-      # Convert any non-numeric values
-      DBH = as.numeric(DBH),
-      Number.stems = as.numeric(Number.stems),
-      adjusted_DBH = DBH/Number.stems) %>%
-    # Remove non-numeric values
-    filter(!is.na(adjusted_DBH),Number.stems>0) %>%
-    # Group by yards
-    group_by(Yard.Code) %>%
-    # Find DBHs for all plants, trees, and shrubs
-    summarise(
-      mean_dbh = mean(adjusted_DBH, na.rm=TRUE),
-      .groups="drop"
-    )
-}
-mean_DBH_df <- mean_dbh_by_yard(yard_trees_verified)
+# Find DBH of trees, shrubs, and all plants from data frame
+mean_DBH_df <- yard_trees_verified %>%
+  # Convert any non-numeric values
+  mutate(DBH = as.numeric(DBH),
+         Number.stems = as.numeric(Number.stems),
+         adjusted_DBH = DBH/Number.stems) %>%
+  # Remove non-numeric values
+  filter(!is.na(adjusted_DBH),Number.stems>0) %>%
+  # Group by yards
+  group_by(Yard.Code) %>%
+  # Find DBHs for all plants, trees, and shrubs
+  summarise(
+    mean_dbh = mean(adjusted_DBH, na.rm=TRUE),
+    .groups="drop"
+  )
 
 
 
-# --- 2.4 NUMBER OF FRUITING PLANTS--- # ******
 
-# DEF: Calculate the number of fruiting plants in each yard.
-# Information gathered from "Manual of Woody Landscape Plants" by Michael A. Dirr
+# --- 2.4 PROPORTION OF FRUITING PLANTS--- # ******
+
+# DEF: Calculate the proportion of fruiting plants in each yard.
+# Used information from "Manual of Woody Landscape Plants" by Michael A. Dirr
 # Plants are considered fruiting if they produce fleshy fruit during spring or summer
 
-# Using the species listed in yard_trees_verified, determine which species are fruiting:
-unique(yard_trees_verified$Plant.sci) # get list of species
-
-# Create function that counts fruiting plants in each season and overall per yard
-fruiting_count_by_yard <- function(plant_df){
-  plant_df %>%
-    mutate(
-      is_fruiting = Fleshy == "yes" &
-        Fruit_season %in% c("spring", "summer")
-    ) %>%
-    group_by(Yard.Code) %>%
-    summarise(
-      n_fruiting_plants = sum(is_fruiting, na.rm = TRUE),
-      .groups = "drop"
-    )
-}
-fruiting_df <- fruiting_count_by_yard(yard_trees_verified)
+# Find proportion of fruiting plants in each season and overall per yard
+fruiting_df <- yard_trees_verified %>%
+  # Fruiting plants are plants with fleshy fruits that are ripe in spring or summer
+  mutate(is_fruiting = Fleshy == "yes" &
+           Fruit_season %in% c("spring", "summer")) %>%
+  group_by(Yard.Code) %>%
+  summarise(
+    n_fruiting_plants = sum(is_fruiting, na.rm = TRUE),
+    .groups = "drop") %>%
+  left_join(tree_shrub_count, by = c("Yard.Code" = "Yard.Code")) %>% # add number of trees and shrubs to df
+  mutate(proportion_fruit = n_fruiting_plants / (tree + shrub)) %>% # proportion native plants
+  select(-tree, -shrub)
 
 
 
-# --- 2.5 NATIVITY--- #
 
-# DEF: Calculate the number of native tree and shrub species are in each yard.
-native_count_by_yard <- function(plant_df){
-  plant_df %>%
-    mutate(is_native = Native == "yes") %>%
-    group_by(Yard.Code) %>%
-    summarise(
-      n_native_plants = sum(is_native, na.rm = TRUE),
-      .groups = "drop"
-    )
-}
-native_df <- native_count_by_yard(yard_trees_verified)
+# --- 2.5 PROPORTION OF NATIVE PLANTS --- #
+
+# DEF: Calculate the proportion of native tree and shrub species are in each yard.
+
+# Find number of native plants per yard
+native_df <- yard_trees_verified %>%
+  mutate(is_native = Native == "yes") %>% # Native trees have "yes" in Native column
+  group_by(Yard.Code) %>%
+  summarise(n_native_plants = sum(is_native, na.rm = TRUE),.groups = "drop") %>%
+  
+  left_join(tree_shrub_count, by = c("Yard.Code" = "Yard.Code")) %>% # add number of trees and shrubs to df
+  mutate(proportion_native = n_native_plants / (tree + shrub)) %>% # proportion native plants
+  select(-tree, -shrub)
+
 
 
 

@@ -25,18 +25,18 @@ yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 
 # Remove yard ID, centroid data, and SR columns
 yard_features_only <- select(yard_characteristics, 
-                                c(area,back_area_ha,tree,shrub,density,mean_dbh,
-                                  n_fruiting_plants,n_native_plants))
+                                c(area,tree,shrub,density,mean_dbh,
+                                  n_fruiting_plants,proportion_native))
 
 
 # 1.12 Create correlation matrices
 # Numerical correlation matrix
 cor_matrix_yard <- cor(yard_features_only) # numerical correlation matrix
 cor_matrix_yard
-
 corrplot(cor_matrix_yard) # visual correlation matrix
 
-# Conclusions: should remove back_area_ha (which I already planned to) and density
+# Conclusions: should remove density due to high correlation with trees and shrubs
+
 
 
 # ============================================================================ # 

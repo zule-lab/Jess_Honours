@@ -179,6 +179,7 @@ multi_hist_yard_characteristics
 
 # 2.11 Make long data frame for each variable with each season's SR
 yard_characteristics_long <- yard_characteristics %>%
+  # remove spatial variables
   select(-c(back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,
             long_radius_m,lat,long,utm_zone,utm_easting,utm_northing)) %>%
   pivot_longer(
