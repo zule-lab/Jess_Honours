@@ -14,6 +14,7 @@ library(stringr)
 library(ggplot2)
 library(itsadug)
 library(mgcv)
+library(gratia)
 
 
 
@@ -133,7 +134,7 @@ yard_global_GAM <- gam(richness ~ season +
                          s(proportion_native_scale, by = season, k = 5), 
                        data = yard_GAM_df, method = "REML")
     # note: after standardizing fruiting plants for proportion, the model could 
-           # run with fruiting plants included
+    #       run with fruiting plants included
 
 summary(yard_global_GAM)
 
@@ -144,7 +145,7 @@ vis.gam(yard_global_GAM, view = c("mean_dbh_scale","season"), theta = 60, n.grid
 par(mfrow = c(2,6))
 plot(yard_global_GAM)
 
-
+draw(yard_global_GAM)
 
 # --- 2.4 MODEL CHECKING --- #
 
@@ -153,8 +154,11 @@ concurvity(yard_global_GAM) # problems: all variables ~0.9 :(
 
 # 2.42 Gam.check
 par(mfrow = c(2,2))
-gam.check(yard_global_GAM) # no problems!
+gam.check(yard_global_GAM) # problem: heteroscedasticity, I fear
 
+# 2.43 Gratia model check
+par(mfrow = c(2,2))
+appraise(yard_global_GAM) 
 
 
 
@@ -230,7 +234,7 @@ summary(yard_season_area_GAM)
 
 par(mfrow = c(1,2))
 plot(yard_season_area_GAM) 
-
+draw(yard_season_area_GAM)
 
 
 # --- 3.4 MODEL CHECKING --- #
@@ -378,7 +382,7 @@ gam.check(yard_null_GAM)
 
 # Model selection according to AIC
 AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
-# result: yard_global_GAM has the lowest AIC value (FUCK YEAH - i think)
+# result: yard_global_GAM has the lowest AIC value (hell yeah - i think)
 
 
 
