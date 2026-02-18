@@ -15,6 +15,7 @@ library(ggplot2)
 library(itsadug)
 library(mgcv)
 library(gratia)
+library(patchwork)
 
 
 
@@ -121,6 +122,8 @@ write.csv(yard_GAM_df, file="2 - Cleaned/yard_GAM_df.csv", row.names=FALSE)
 #   tree_scale: numeric
 #   shrub_scale: numeric
 #   mean_dbh_scale: numeric
+
+# Removed variables due to high concurvity: 
 #   proportion_fruit_scale: numeric
 #   proportion_native_scale: numeric
 
@@ -142,7 +145,7 @@ summary(yard_global_GAM)
 par(mfrow = c(1,1))
 vis.gam(yard_global_GAM, view = c("shrub_scale","season"), theta = 1, n.grid = 50, lwd = 0.4)
 vis.gam(yard_global_GAM, view = c("mean_dbh_scale","season"), theta = 60, n.grid = 50, lwd = 0.4)
-par(mfrow = c(2,6))
+par(mfrow = c(2,4))
 plot(yard_global_GAM)
 
 draw(yard_global_GAM)
@@ -150,7 +153,8 @@ draw(yard_global_GAM)
 # --- 2.4 MODEL CHECKING --- #
 
 # 2.41 Concurvity testing
-concurvity(yard_global_GAM) # problems: all variables ~0.9 :(
+concurvity(yard_global_GAM) # all below 0.8
+# note potential concurvity with mean DBH - be careful!
 
 # 2.42 Gam.check
 par(mfrow = c(2,2))
@@ -159,21 +163,6 @@ gam.check(yard_global_GAM) # problem: heteroscedasticity, I fear
 # 2.43 Gratia model check
 par(mfrow = c(2,2))
 appraise(yard_global_GAM) 
-
-
-
-
-#### Stuff with Barbara - concurvity
-yard_GAMM_test <- gam(richness ~ 
-                         s(area, k = 5) + 
-                         s(tree, k = 5) + 
-                         s(shrub, k = 5) + 
-                         s(mean_dbh, k = 5) +
-                         s(n_native_plants, k = 5),
-                       data = yard_GAM_df, method = "REML")
-concurvity(yard_GAMM_test)
-# note potential concurvity with mean DBH - be careful!
-
 
 
 
@@ -239,9 +228,6 @@ draw(yard_season_area_GAM)
 
 # --- 3.4 MODEL CHECKING --- #
 
-# 3.41 Concurvity testing
-concurvity(yard_season_area_GAM) # no problems!
-
 # 3.42 Gam.check
 par(mfrow = c(2,2))
 gam.check(yard_season_area_GAM) # problem: low p-values
@@ -301,10 +287,6 @@ summary(yard_season_GAM)
 
 # --- 4.4 MODEL CHECKING --- #
 
-# 4.41 Concurvity testing
-concurvity(yard_season_GAM)
-# "nothing to do for this model" according to R
-
 # 4.42 Gam.check
 par(mfrow = c(2,2))
 gam.check(yard_season_GAM)
@@ -360,10 +342,6 @@ plot(yard_null_GAM) # not possible to plot ("apparently")
 
 # --- 5.4 MODEL CHECKING --- #
 
-# 5.41 Concurvity testing
-concurvity(yard_null_GAM)
-# "nothing to do for this model" according to R
-
 # 5.42 Gam.check
 par(mfrow = c(2,2))
 gam.check(yard_null_GAM)
@@ -381,8 +359,160 @@ gam.check(yard_null_GAM)
 # --- 6.1 GAM SELECTION --- #
 
 # Model selection according to AIC
-AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
-# result: yard_global_GAM has the lowest AIC value (hell yeah - i think)
+AIC_results <- AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
+AIC_results
+# result: yard_global_GAM has the lowest AIC value by >25 units
 
+
+
+
+
+
+# ============================================================================ # 
+# 7. PLOTTING OUTPUT TOP MODEL
+# ============================================================================ # 
+
+# --- 7.1 CREATE DATAFRAME TO PREDICT FROM --- #
+
+## create a function to create a smooth plot from the GAM model from unscaled data
+
+smooth_plot_df <- function(model, var, data, n = 200) {
+  
+  # identify scaled version of the variable
+  scaled_var <- paste0(var, "_scale")
+  
+  # create prediction grid in original units
+  newdat <- expand.grid(
+    # create n evenly spaced values across observed range of variable
+    x = seq(min(data[[var]], na.rm = TRUE),
+            max(data[[var]], na.rm = TRUE),
+            length.out = n),
+    season = levels(data$season) # repeat those values for each season
+  )
+  
+  names(newdat)[1] <- var # correctly rename the predictor column
+  
+  # scale predictor variable correctly (on scale of model)
+  newdat[[scaled_var]] <-
+    (newdat[[var]] - mean(data[[var]], na.rm = TRUE)) /
+    sd(data[[var]], na.rm = TRUE)
+    # mean and sd recreate scaled version of variable
+  
+  # hold other predictors at mean (0 on scaled scale) to isolate effect of variable
+  for (v in c("area", "tree", "shrub", "mean_dbh")) {
+    sname <- paste0(v, "_scale")
+    if (!sname %in% names(newdat)) { # prevent overwriting
+      newdat[[sname]] <- 0
+    }
+  }
+  
+  # generate new predictions from the GAM
+  pr <- predict(
+    model,
+    newdata = newdat,
+    type = "response", # predictions on original response scale
+    se.fit = TRUE
+  )
+  
+  # add predictions and confidence intervals
+  newdat$fit <- pr$fit
+  newdat$se  <- pr$se.fit
+  newdat$lwr <- newdat$fit - 1.96 * newdat$se
+  newdat$upr <- newdat$fit + 1.96 * newdat$se
+  
+  newdat # contains plotting frame
+}
+
+
+# Summary data for global GAM
+gam_summ <- summary(yard_global_GAM)
+
+# Extract p-values for smoothed yard variables from global GAM
+smooth_pvals <- gam_summ$s.table[, "p-value"]
+
+# For a given predictor and season, check whether the smooth GAM effect for that 
+# season is statistically significant
+get_sig <- function(var, season, pvals) {
+  term <- paste0("s(", var, "_scale):season", season)
+  pvals[term] < 0.05
+}
+
+# Create list of variables and x-axis labels
+vars <- c("area", "tree", "shrub", "mean_dbh")
+xlabels <- c("Area (m²)", "Number of trees",
+             "Number of shrubs", "Mean DBH (cm)")
+season_cols <- c(
+  migration = "#62B751",
+  breeding = "#07A1FF")
+
+
+
+# --- 7.2 PREDICT FROM GAM & VISUALIZE --- #
+
+# Create a multi-panel figure showing seasonal smooth effects for predictors
+yard_GAM_figs <- lapply(seq_along(vars), function(i) { # run function once for each variable
+  
+  var <- vars[i] # the ith variable
+  
+  # generate prediction data frame for variable
+  df <- smooth_plot_df(
+    model = yard_global_GAM,
+    var   = var,
+    data  = yard_GAM_df
+  )
+  
+  # create small annotation df for p-values
+  p_annot <- data.frame(
+    season = levels(df$season),
+    smooth_pvals = sapply(levels(df$season), function(s) {
+      term <- paste0("s(", var, "_scale):season", s)
+      smooth_pvals[term]
+    })
+  )
+  p_annot$y <- max(df$upr, na.rm = TRUE) * 0.95 # position of text above curve
+  p_annot$x <- quantile(df[[var]], probs = seq(0.15, 0.85, length.out = nrow(p_annot))) # position of text staggered
+  
+  # build the ggplot multi-panel figure
+  df %>%
+    ggplot(aes(x = .data[[var]], y = fit, # var is a string, not a col name
+               colour = season, fill = season)) +
+    
+    geom_line(linewidth = 1.1) + # smooth lines, coloured by season
+    
+    geom_ribbon(aes(ymin = lwr, ymax = upr), # confidence ribbons by season
+                alpha = 0.25, colour = NA) + # colour=NA removes borders
+    
+    # colour by season
+    scale_colour_manual(values = season_cols)+
+    scale_fill_manual(values = season_cols) +
+    
+    # add p values
+    geom_text(
+      data = p_annot,
+      aes(x = x, y = y,
+          label = case_when(
+            smooth_pvals < 0.001 ~ "***",
+            smooth_pvals < 0.01  ~ "**",
+            smooth_pvals < 0.05  ~ "*",
+            TRUE         ~ ""
+          ),
+      #inherit.aes = FALSE,
+      #show.legend = FALSE
+    )) +
+    
+    labs( # label axes
+      x = xlabels[i],
+      y = "Predicted species richness",
+      title = paste("Effect of", var, "by season")
+    ) +
+    theme_classic() +
+    theme(
+      legend.position = "top",
+      plot.title = element_text(face = "bold")
+    )
+})
+
+# Plot multi-panel figure of SR ~ yard habitat feature variables by season
+wrap_plots(yard_GAM_figs, ncol = 2)
 
 
