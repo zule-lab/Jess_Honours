@@ -129,9 +129,9 @@ yard_global_GAM <- gam(richness ~ season +
                          s(area_scale, by = season, k = 5) + 
                          s(tree_scale, by = season, k = 5) + 
                          s(shrub_scale, by = season, k = 5) + 
-                         s(mean_dbh_scale, by = season, k = 5) + 
-                         s(proportion_fruit_scale, by = season, k = 5) + 
-                         s(proportion_native_scale, by = season, k = 5), 
+                         s(mean_dbh_scale, by = season, k = 5),
+                         #s(proportion_fruit_scale, by = season, k = 5) + 
+                         #s(proportion_native_scale, by = season, k = 5), 
                        data = yard_GAM_df, method = "REML")
     # note: after standardizing fruiting plants for proportion, the model could 
     #       run with fruiting plants included
