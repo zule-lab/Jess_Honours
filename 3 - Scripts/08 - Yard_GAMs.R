@@ -153,7 +153,8 @@ draw(yard_global_GAM)
 # --- 2.4 MODEL CHECKING --- #
 
 # 2.41 Concurvity testing
-concurvity(yard_global_GAM) # all below 0.8
+global_concurvity <- concurvity(yard_global_GAM) # all below 0.8
+global_concurvity
 # note potential concurvity with mean DBH - be careful!
 
 # 2.42 Gam.check
@@ -469,8 +470,8 @@ yard_GAM_figs <- lapply(seq_along(vars), function(i) { # run function once for e
       smooth_pvals[term]
     })
   )
-  p_annot$y <- max(df$upr, na.rm = TRUE) * 0.95 # position of text above curve
-  p_annot$x <- quantile(df[[var]], probs = seq(0.15, 0.85, length.out = nrow(p_annot))) # position of text staggered
+  p_annot$y <- max(df$upr, na.rm = TRUE) * 1.0 # position of text above curve
+  p_annot$x <- quantile(df[[var]], probs = seq(0.15, 0.79, length.out = nrow(p_annot))) # position of text staggered
   
   # build the ggplot multi-panel figure
   df %>%
@@ -486,19 +487,22 @@ yard_GAM_figs <- lapply(seq_along(vars), function(i) { # run function once for e
     scale_colour_manual(values = season_cols)+
     scale_fill_manual(values = season_cols) +
     
-    # add p values
-    geom_text(
-      data = p_annot,
-      aes(x = x, y = y,
-          label = case_when(
-            smooth_pvals < 0.001 ~ "***",
-            smooth_pvals < 0.01  ~ "**",
-            smooth_pvals < 0.05  ~ "*",
-            TRUE         ~ ""
+    # add p value stars to plot
+    geom_text(data = p_annot,
+      aes(x = x, 
+          y = y,
+          colour=season,
+          label = 
+            case_when(
+              smooth_pvals < 0.001 ~ paste0("*** ","p = ", signif(smooth_pvals, 2)),
+              smooth_pvals < 0.01  ~ paste0("** ","p = ", signif(smooth_pvals, 2)),
+              smooth_pvals < 0.05  ~ paste0("* ","p = ", signif(smooth_pvals, 2)),
+              TRUE ~ "")
           ),
-      #inherit.aes = FALSE,
-      #show.legend = FALSE
-    )) +
+      inherit.aes = FALSE,
+      show.legend = FALSE,
+      size=3.0
+      ) +
     
     labs( # label axes
       x = xlabels[i],
@@ -513,6 +517,6 @@ yard_GAM_figs <- lapply(seq_along(vars), function(i) { # run function once for e
 })
 
 # Plot multi-panel figure of SR ~ yard habitat feature variables by season
-wrap_plots(yard_GAM_figs, ncol = 2)
-
+gam_fig_predictive <- wrap_plots(yard_GAM_figs, ncol = 2)
+gam_fig_predictive
 
