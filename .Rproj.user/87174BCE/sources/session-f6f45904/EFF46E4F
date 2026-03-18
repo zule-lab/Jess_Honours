@@ -1,0 +1,26 @@
+{
+    "id": "EFF46E4F",
+    "path": "~/Desktop/Jess_Honours/3 - Scripts/05 - Summary_Stats.R",
+    "project_path": "3 - Scripts/05 - Summary_Stats.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1768400497797.0,
+    "source_on_save": true,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "124,0",
+        "scrollLine": "124"
+    },
+    "folds": "24|41|26|0|\n57|26|61|0|\n95|39|99|0|\n128|37|133|0|\n174|42|179|0|\n",
+    "lastKnownWriteTime": 1773327436,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1773327436626,
+    "read_only": false,
+    "read_only_alternatives": []
+}
