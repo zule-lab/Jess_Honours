@@ -39,9 +39,22 @@ library(patchwork)
 #### NOTE: each numeric variable has a scaled version ("variable_scale")
 
 # 1.12 Prepare long data frame from yard_characteristics_long.csv
-yard_characteristics_long <- read_csv("2 - Cleaned/yard_characteristics_long.csv")
+# Long data frame for each variable with each season's SR
+yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 
-# Create data frame
+yard_characteristics_long <- yard_characteristics %>%
+  # remove spatial variables
+  select(-c(back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,
+            long_radius_m,lat,long,utm_zone,utm_easting,utm_northing)) %>%
+  pivot_longer(
+    cols = starts_with("SR_"), # select columns starting with SR_
+    names_to = "season", # name of new column to store old column names
+    values_to = "richness" # name of new column to store values
+  )
+# yard_characteristics_long <- read_csv("2 - Cleaned/yard_characteristics_long.csv")
+
+
+# Create data frame for GAM model
 yard_GAM_df <- yard_characteristics_long %>%
   # remove correlated variables (density)
   select(-c(density)) %>%
@@ -360,8 +373,9 @@ gam.check(yard_null_GAM)
 # --- 6.1 GAM SELECTION --- #
 
 # Model selection according to AIC
-AIC_results <- AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
-AIC_results
+AIC_yard_GAM <- AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
+AIC_yard_GAM
+
 # result: yard_global_GAM has the lowest AIC value by >25 units
 
 

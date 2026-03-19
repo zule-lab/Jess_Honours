@@ -251,26 +251,26 @@ concurvity(mig_50m_canopy_GAM) #highly concurve
 
 
 # --- 3.5 BREEDING GAM: 100 m SCALE --- #
-mig_100m_canopy_GAM <- gam(richness ~
+bre_100m_canopy_GAM <- gam(richness ~
                              s(low_canopy_100m, k = 5) + 
                              s(high_canopy_100m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
-summary(mig_100m_canopy_GAM)
+summary(bre_100m_canopy_GAM)
 
-concurvity(mig_100m_canopy_GAM) # highly concurve
+concurvity(bre_100m_canopy_GAM) # highly concurve
 
 
 
 
 
 # --- 3.6 BREEDING GAM: 200 m SCALE --- #
-mig_200m_canopy_GAM <- gam(richness ~
+bre_200m_canopy_GAM <- gam(richness ~
                              s(low_canopy_200m, k = 5) + 
                              s(high_canopy_200m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
-summary(mig_200m_canopy_GAM)
+summary(bre_200m_canopy_GAM)
 
 concurvity(mig_200m_canopy_GAM) #highly concurve
 
@@ -278,18 +278,17 @@ concurvity(mig_200m_canopy_GAM) #highly concurve
 
 
 # --- 3.7 BREEDING GAM: 400 m SCALE --- #
-mig_400m_canopy_GAM <- gam(richness ~
-                             s(low_canopy_400m, k = 5) + 
+bre_400m_canopy_GAM <- gam(richness ~
                              s(high_canopy_400m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
-summary(mig_400m_canopy_GAM)
+summary(bre_400m_canopy_GAM)
 
-concurvity(mig_400m_canopy_GAM) # highly concurve
+concurvity(bre_400m_canopy_GAM) # highly concurve
 
 
-AIC_mig_canopy_GAM <- AIC(mig_25m_canopy_GAM, mig_50m_canopy_GAM, mig_100m_canopy_GAM, mig_200m_canopy_GAM, mig_400m_canopy_GAM)
-AIC_mig_canopy_GAM
+AIC_bre_canopy_GAM <- AIC(bre_25m_canopy_GAM, bre_50m_canopy_GAM, bre_100m_canopy_GAM, bre_200m_canopy_GAM, bre_400m_canopy_GAM)
+AIC_bre_canopy_GAM
 
 # ============================================================================ # 
 # 4. (POSSIBLE) GAM 

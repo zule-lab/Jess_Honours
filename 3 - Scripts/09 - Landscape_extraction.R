@@ -117,7 +117,7 @@ for (b in buffers) {
 canopy_output$geometry <- NULL
 
 # Write csv with new canopy height data
-write.csv(canopy_output, "2 - Cleaned/extracted_canopy_df.csv")
+write.csv(canopy_output, "1 - Input/canopy_output.csv")
 
 
 

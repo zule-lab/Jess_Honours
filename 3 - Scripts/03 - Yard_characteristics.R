@@ -170,8 +170,8 @@ native_df <- yard_trees_verified %>%
 # Import SR_long.csv for species richnesses
 SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
-# Convert into a wide data frame with the datasets as the columns and yards as rows
-richness_wide <- SR_long %>%
+# Convert into a wide data frame with season_year as the columns and yards as rows
+SR_wide <- SR_long %>%
   pivot_wider(
     id_cols    = Code,
     names_from = dataset,
@@ -180,7 +180,7 @@ richness_wide <- SR_long %>%
 
 # Rename Code column to Yard.Code for consistency, and add SR to richness columns
 # for clarity
-richness_wide <- richness_wide %>% 
+SR_wide <- SR_wide %>% 
   rename(Yard.Code = Code,
          SR_total = total,
          SR_mig_2024 = mig_2024,
@@ -190,6 +190,8 @@ richness_wide <- richness_wide %>%
          SR_breed_2025 = breed_2025,
          SR_breed = breed_total)
 
+# Export SR_wide data frame
+write.csv(SR_wide, file="2 - Cleaned/SR_wide.csv", row.names=FALSE)
 
 
 
@@ -217,7 +219,7 @@ yard_characteristics <- Reduce(
     mean_DBH_df,
     fruiting_df,
     native_df,
-    richness_wide
+    SR_wide
   )
 )
 
