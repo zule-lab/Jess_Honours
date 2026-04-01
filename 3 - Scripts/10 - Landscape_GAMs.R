@@ -160,10 +160,20 @@ canopy_breeding_GAM_df <- canopy_GAM_df %>%
 
 
 # --- 2.3 MIGRATION GAM: 25 m SCALE --- #
-mig_25m_canopy_GAM <- gam(richness ~
+# All veg layers
+mig_25m_veg_GAM <- gam(richness ~
                          s(low_canopy_25m, k = 5) + 
                          s(high_canopy_25m, k = 5),
                        data = canopy_migration_GAM_df, method = "REML")
+
+summary(mig_25m_veg_GAM)
+
+concurvity(mig_25m_veg_GAM)
+
+# Just canopy layer
+mig_25m_canopy_GAM <- gam(richness ~ 
+                            s(high_canopy_25m, k = 5),
+                          data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_25m_canopy_GAM)
 
@@ -172,56 +182,96 @@ concurvity(mig_25m_canopy_GAM)
 
 
 # --- 2.4 MIGRATION GAM: 50 m SCALE --- #
-mig_50m_canopy_GAM <- gam(richness ~
+# All veg
+mig_50m_veg_GAM <- gam(richness ~
                             s(low_canopy_50m, k = 5) + 
+                            s(high_canopy_50m, k = 5),
+                          data = canopy_migration_GAM_df, method = "REML")
+
+summary(mig_50m_veg_GAM)
+
+concurvity(mig_50m_veg_GAM) #highly concurve
+
+# Just canopy 
+mig_50m_canopy_GAM <- gam(richness ~
                             s(high_canopy_50m, k = 5),
                           data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_50m_canopy_GAM)
 
-concurvity(mig_50m_canopy_GAM) #highly concurve
+concurvity(mig_50m_canopy_GAM)
+
 
 
 # --- 2.5 MIGRATION GAM: 100 m SCALE --- #
-mig_100m_canopy_GAM <- gam(richness ~
+# All veg
+mig_100m_veg_GAM <- gam(richness ~
                             s(low_canopy_100m, k = 5) + 
                             s(high_canopy_100m, k = 5),
                           data = canopy_migration_GAM_df, method = "REML")
 
+summary(mig_100m_veg_GAM)
+concurvity(mig_100m_veg_GAM)
+
+# Just canopy
+mig_100m_canopy_GAM <- gam(richness ~
+                             s(high_canopy_100m, k = 5),
+                           data = canopy_migration_GAM_df, method = "REML")
+
 summary(mig_100m_canopy_GAM)
-
-concurvity(mig_100m_canopy_GAM) # highly concurve
-
-
+concurvity(mig_100m_canopy_GAM)
 
 
 
 # --- 2.6 MIGRATION GAM: 200 m SCALE --- #
-mig_200m_canopy_GAM <- gam(richness ~
+# All veg
+mig_200m_veg_GAM <- gam(richness ~
                              s(low_canopy_200m, k = 5) + 
                              s(high_canopy_200m, k = 5),
                            data = canopy_migration_GAM_df, method = "REML")
 
+summary(mig_200m_veg_GAM)
+concurvity(mig_200m_veg_GAM) #highly concurve
+
+# Just canopy
+mig_200m_canopy_GAM <- gam(richness ~
+                             s(high_canopy_200m, k = 5),
+                           data = canopy_migration_GAM_df, method = "REML")
+
 summary(mig_200m_canopy_GAM)
-
-concurvity(mig_200m_canopy_GAM) #highly concurve
-
-
+concurvity(mig_200m_canopy_GAM) 
 
 
 # --- 2.7 MIGRATION GAM: 400 m SCALE --- #
-mig_400m_canopy_GAM <- gam(richness ~
+# All veg
+mig_400m_veg_GAM <- gam(richness ~
                              s(low_canopy_400m, k = 5) + 
                              s(high_canopy_400m, k = 5),
                            data = canopy_migration_GAM_df, method = "REML")
 
+summary(mig_400m_veg_GAM)
+
+concurvity(mig_400m_veg_GAM) # highly concurve
+
+# Just canopy
+mig_400m_canopy_GAM <- gam(richness ~
+                             s(high_canopy_400m, k = 5),
+                           data = canopy_migration_GAM_df, method = "REML")
+
 summary(mig_400m_canopy_GAM)
+concurvity(mig_400m_canopy_GAM)
 
-concurvity(mig_400m_canopy_GAM) # highly concurve
 
+
+###### AIC SELECTION
+AIC_mig_veg_GAM <- AIC(mig_25m_veg_GAM, mig_50m_veg_GAM, mig_100m_veg_GAM, mig_200m_veg_GAM, mig_400m_veg_GAM)
+AIC_mig_veg_GAM
 
 AIC_mig_canopy_GAM <- AIC(mig_25m_canopy_GAM, mig_50m_canopy_GAM, mig_100m_canopy_GAM, mig_200m_canopy_GAM, mig_400m_canopy_GAM)
 AIC_mig_canopy_GAM
+
+
+
 
 
 
@@ -229,66 +279,126 @@ AIC_mig_canopy_GAM
 # 3. BREEDING GAMS AT EACH SCALE
 # ============================================================================ # 
 # --- 3.3 BREEDING GAM: 25 m SCALE --- #
-bre_25m_canopy_GAM <- gam(richness ~
+# All veg
+bre_25m_veg_GAM <- gam(richness ~
                             s(low_canopy_25m, k = 5) + 
                             s(high_canopy_25m, k = 5),
                           data = canopy_breeding_GAM_df, method = "REML")
 
-summary(bre_25m_canopy_GAM)
+summary(bre_25m_veg_GAM)
+concurvity(bre_25m_veg_GAM)
 
+# Just high canopy
+bre_25m_canopy_GAM <- gam(richness ~
+                            s(high_canopy_25m, k = 5),
+                          data = canopy_breeding_GAM_df, method = "REML")
+
+summary(bre_25m_canopy_GAM)
 concurvity(bre_25m_canopy_GAM)
 
 
 # --- 3.4 BREEDING GAM: 50 m SCALE --- #
-bre_50m_canopy_GAM <- gam(richness ~
+# All veg
+bre_50m_veg_GAM <- gam(richness ~
                             s(low_canopy_50m, k = 5) + 
                             s(high_canopy_50m, k = 5),
                           data = canopy_breeding_GAM_df, method = "REML")
 
-summary(bre_50m_canopy_GAM)
+summary(bre_50m_veg_GAM)
+concurvity(mig_50m_veg_GAM) #highly concurve
 
-concurvity(mig_50m_canopy_GAM) #highly concurve
+# Just high canopy
+bre_50m_canopy_GAM <- gam(richness ~
+                            s(high_canopy_50m, k = 5),
+                          data = canopy_breeding_GAM_df, method = "REML")
+
+summary(bre_50m_canopy_GAM)
+concurvity(mig_50m_canopy_GAM) 
+
 
 
 # --- 3.5 BREEDING GAM: 100 m SCALE --- #
-bre_100m_canopy_GAM <- gam(richness ~
+# All veg
+bre_100m_veg_GAM <- gam(richness ~
                              s(low_canopy_100m, k = 5) + 
                              s(high_canopy_100m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
+summary(bre_100m_veg_GAM)
+concurvity(bre_100m_veg_GAM) # highly concurve
+
+# Just high canopy
+bre_100m_canopy_GAM <- gam(richness ~
+                             s(high_canopy_100m, k = 5),
+                           data = canopy_breeding_GAM_df, method = "REML")
+
 summary(bre_100m_canopy_GAM)
-
-concurvity(bre_100m_canopy_GAM) # highly concurve
-
+concurvity(bre_100m_canopy_GAM)
 
 
 
 
 # --- 3.6 BREEDING GAM: 200 m SCALE --- #
-bre_200m_canopy_GAM <- gam(richness ~
+# All veg
+bre_200m_veg_GAM <- gam(richness ~
                              s(low_canopy_200m, k = 5) + 
                              s(high_canopy_200m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
+summary(bre_200m_veg_GAM)
+concurvity(bre_200m_veg_GAM) #highly concurve
+
+# Just high canopy
+bre_200m_canopy_GAM <- gam(richness ~
+                             s(high_canopy_200m, k = 5),
+                           data = canopy_breeding_GAM_df, method = "REML")
+
 summary(bre_200m_canopy_GAM)
-
-concurvity(mig_200m_canopy_GAM) #highly concurve
-
-
+concurvity(bre_200m_canopy_GAM)
 
 
 # --- 3.7 BREEDING GAM: 400 m SCALE --- #
+# All veg
+bre_400m_veg_GAM <- gam(richness ~
+                             s(low_canopy_400m, k = 5) + 
+                             s(high_canopy_400m, k = 5),
+                           data = canopy_breeding_GAM_df, method = "REML")
+
+summary(bre_400m_veg_GAM)
+concurvity(bre_400m_veg_GAM) # highly concurve
+
+# Just high canopy
 bre_400m_canopy_GAM <- gam(richness ~
                              s(high_canopy_400m, k = 5),
                            data = canopy_breeding_GAM_df, method = "REML")
 
 summary(bre_400m_canopy_GAM)
-
 concurvity(bre_400m_canopy_GAM) # highly concurve
 
 
-AIC_bre_canopy_GAM <- AIC(bre_25m_canopy_GAM, bre_50m_canopy_GAM, bre_100m_canopy_GAM, bre_200m_canopy_GAM, bre_400m_canopy_GAM)
+###### AIC SELECTION
+
+AIC_bre_veg_GAM <- AIC(bre_25m_veg_GAM, 
+                       bre_50m_veg_GAM, 
+                       bre_100m_veg_GAM, 
+                       bre_200m_veg_GAM, 
+                       bre_400m_veg_GAM)
+AIC_bre_veg_GAM
+
+AIC_bre_canopy_GAM <- AIC(bre_25m_canopy_GAM, 
+                          bre_50m_canopy_GAM,
+                          bre_100m_canopy_GAM, 
+                          bre_200m_canopy_GAM, 
+                          bre_400m_canopy_GAM)
 AIC_bre_canopy_GAM
+
+
+
+
+
+
+
+
 
 # ============================================================================ # 
 # 4. (POSSIBLE) GAM 
