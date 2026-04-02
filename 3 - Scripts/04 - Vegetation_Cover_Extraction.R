@@ -24,6 +24,7 @@ library(tidyr)
 library(readr)
 library(lubridate)
 library(progressr)
+library(stringr)
 
 
 # ============================================================================ #
@@ -57,7 +58,7 @@ centroid_utm_df$Yard.Code <- as.factor(centroid_utm_df$Yard.Code)
 
 
 
-## =========================================================================== #
+# ============================================================================ #
 # 2.  EXTRACTING COVARIATES FROM INDICE CANOPEE RASTER                                
 # ============================================================================ #
 
@@ -123,62 +124,59 @@ write.csv(canopy_output, "1 - Input/canopy_output.csv")
 
 
 
+# ============================================================================ #
+# 3.  CLEANING DATA EXTRACTED FROM INDICE CANOPEE RASTER                                
+# ============================================================================ #
 
-# code that I wrote, but realized was longer than necessary
-'
-# Convert centroid data frame to a spatial data frame
-centroid_deg_sf <- st_as_sf(centroid_deg_df, coords = c("long", "lat"), crs = 4326)
-centroid_utm_sf <- st_as_sf(centroid_utm_df, coords = c("utm_easting", "utm_northing"), crs = 32618) # UTM zone 18
-st_crs(centroid_utm_sf)
+# --- 1.1 LANDSCAPE CHARACTERISTICS DATA FRAME PREPARATION --- #
 
-# Ensure the CRS matches the CRS of the raster before buffering.
-centroid_deg_sf <- st_transform(centroid_deg_sf, crs = st_crs(indice_660.ras))
-centroid_utm_sf <- st_transform(centroid_utm_sf, crs = st_crs(indice_660.ras))
-st_crs(indice_660.ras) # seems to be in MTM coordinates
+# VARIABLES FOR DF
+#   Yard.Code
+#   Variable 4 (canopy cover below 3 m)
+#   Variable 5 (canopy cover above 3 m)
+#   Season
+#   Year
+#   Richness
 
-# Define buffer distances
-buffers <- c(25, 50, 100, 200, 400)
 
-# Initialize list to store results
-results_list <- list()
 
-# Loop through canopy raster at each buffer and extract data
-for (i in 1:length(buffers)) {
-  
-  # Create buffer
-  buffer <- st_buffer(centroid_deg_sf, buffers[i])
-  
-  # Convert buffer to to terra format
-  buffer_vect <- vect(buffer)
-  
-  # Crop raster to buffer
-  r_crop <- crop(indice_660.ras, buffer_vect)
-  
-  # Extract raster values within the buffer
-  values <- terra::extract(r_crop, buffer_vect)
-  
-  # Count cells of each land cover types (types 1, 2, 3, 4)
-  summary <- values %>%
-    dplyr::group_by(ID, Type = `660_IndiceCanopee_2023`) %>%   # lyr.1 is raster value column
-    dplyr::summarise(n = n(), .groups = "drop") %>%
-    dplyr::group_by(ID) %>% # group by yard to count number of cells
-    dplyr::mutate(
-      total_cells = sum(n), # total number of cells per buffer
-      percentage = 100 * n / total_cells, # convert to percentages of land cover
-      buffer_radius_m = buffers[i]
-    ) %>%
-    dplyr::ungroup()
-  
-  results_list[[i]] <- summary
-  names(results_list)[i] <- buffers[i]
-}
+# 1.11 Remove unnecessary variables from canopy_output data frame
+canopy_output <- read_csv("1 - Input/canopy_output.csv")
 
-# Convert results into df and matrix
-Canopy_centroid_deg_df <- as.data.frame(rbind(results_list[[1]], results_list[[2]], results_list[[3]], results_list[[4]]))
+canopy_cleaned <- canopy_output %>%
+  # select class 3 (canopy below 3 m) and class 4 (canopy above 3 m) variables
+  select(Yard.Code, starts_with("indice660_class3"), starts_with("indice660_class4")) %>%
+  # remove indice660_ prefix of columns
+  rename_with(~ str_remove(.x,"^indice660_")) %>%
+  # rename class3 columns (canopy below 3 m) for clarity
+  rename_with(~ str_replace(.x, "^class3_", "low_canopy_"), .cols = contains("class3")) %>%
+  # rename class4 columns (canopy above 3 m) for clarity
+  rename_with(~ str_replace(.x, "^class4_", "high_canopy_"), .cols = contains("class4"))
 
-Canopy_centroid_deg_matrix <- Canopy_centroid_deg_df %>% 
-  pivot_wider(names_from = c(Type, buffer_radius_m), values_from = percentage)
 
-remove(Canopy_centroid_deg_df,Canopy_centroid_deg_matrix)
-'
 
+# 1.12 Bind species richness data for each period with canopy data
+SR_wide <- read_csv("2 - Cleaned/SR_wide.csv")
+
+# Create landscape characteristics data frame
+landscape_characteristics <- Reduce(
+  function(x, y) full_join(x, y, by = "Yard.Code"),
+  list(canopy_cleaned,SR_wide))
+
+write.csv(landscape_characteristics, "2 - Cleaned/landscape_characteristics.csv", row.names = FALSE)
+
+
+# 1.13 Make long landscape data frame by splitting season and year
+landscape_characteristics_long <- landscape_characteristics %>%
+  # remove unnecessary SR variables
+  select(-c(SR_total, SR_mig_2024, SR_mig_2025, SR_breed_2024, SR_breed_2025)) %>%
+  # split richness and season into different columns
+  pivot_longer(
+    cols = starts_with("SR_"), # select columns starting with SR_
+    names_to = "season", # name of new column to store old column names
+    values_to = "richness") %>% # name of new column to store values
+  # rename seasons for clarity
+  mutate(season = case_when(str_detect(season,"SR_mig") ~ "migration",
+                            str_detect(season, "SR_breed") ~ "breeding"))
+
+write.csv(landscape_characteristics_long, "2 - Cleaned/landscape_characteristics_long.csv")
