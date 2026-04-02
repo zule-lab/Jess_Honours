@@ -166,8 +166,8 @@ landscape_characteristics <- Reduce(
 write.csv(landscape_characteristics, "2 - Cleaned/landscape_characteristics.csv", row.names = FALSE)
 
 
-# 1.13 Make long landscape data frame by splitting season and year
-landscape_characteristics_long <- landscape_characteristics %>%
+# 1.13 Make split landscape data frame by splitting season and year
+landscape_characteristics_split <- landscape_characteristics %>%
   # remove unnecessary SR variables
   select(-c(SR_total, SR_mig_2024, SR_mig_2025, SR_breed_2024, SR_breed_2025)) %>%
   # split richness and season into different columns
@@ -179,4 +179,18 @@ landscape_characteristics_long <- landscape_characteristics %>%
   mutate(season = case_when(str_detect(season,"SR_mig") ~ "migration",
                             str_detect(season, "SR_breed") ~ "breeding"))
 
-write.csv(landscape_characteristics_long, "2 - Cleaned/landscape_characteristics_long.csv")
+write.csv(landscape_characteristics_split, "2 - Cleaned/landscape_characteristics_split.csv", row.names = FALSE)
+
+
+# 1.14 Make long landscape characteristics data frame by stacking scales
+landscape_characteristics_long <- landscape_characteristics %>%
+  pivot_longer(
+    cols = contains("canopy"), # Holds Yard.Code and SR columns the same
+    names_to = "Type_Scale", # Stores column names (e.g., high_canopy_25m)
+    values_to = "Cover" # Values of new column are vegetation cover values
+  )
+
+write.csv(landscape_characteristics_long, "2 - Cleaned/landscape_characteristics_long.csv", row.names = FALSE)
+
+
+
