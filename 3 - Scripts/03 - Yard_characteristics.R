@@ -167,7 +167,7 @@ native_df <- yard_trees_verified %>%
 # DEF: Take the bird species richness measures for each yard calculated in SR.R 
 # script and stored in "SR_long.csv" and convert them to a wide data frame.
 
-# Import SR_long.csv for species richnesses
+# Import SR_long.csv for species richness
 SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
 # Convert into a wide data frame with season_year as the columns and yards as rows
@@ -209,7 +209,10 @@ write.csv(SR_wide, file="2 - Cleaned/SR_wide.csv", row.names=FALSE)
   # number of fruiting plants: fruiting_count_by_yard
   # bird SR across seasons: richness_wide
 
-# Create yard_characteristics data frame
+
+# --- 4.1 YARD CHARACTERISTICS LONG --- #
+
+# 4.11 Create yard_characteristics data frame
 yard_characteristics <- Reduce(
   function(x, y) full_join(x, y, by = "Yard.Code"),
   list(
@@ -227,5 +230,20 @@ yard_characteristics <- Reduce(
 write.csv(yard_characteristics, file="2 - Cleaned/yard_characteristics.csv", row.names=FALSE)
 
 
+# --- 4.2 YARD CHARACTERISTICS LONG --- #
+
+# 4.21 Make long data frame for each variable with each season's SR
+yard_characteristics_long <- yard_characteristics %>%
+  # remove spatial variables
+  select(-c(back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,
+            long_radius_m,lat,long,utm_zone,utm_easting,utm_northing)) %>%
+  pivot_longer(
+    cols = starts_with("SR_"), # select columns starting with SR_
+    names_to = "season", # name of new column to store old column names
+    values_to = "richness" # name of new column to store values
+  )
+
+# Export yard_characteristics_long data frame
+write.csv(yard_characteristics_long, file="2 - Cleaned/yard_characteristics_long.csv", row.names=FALSE)
 
 
