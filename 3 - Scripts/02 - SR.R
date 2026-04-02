@@ -46,7 +46,9 @@ breeding <- read_csv("2 - Cleaned/cleaned_breeding_data.csv")
 
 
 
-# --- 1.1 TOTAL --- ####
+
+
+# --- 1.1 TOTAL --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -69,7 +71,6 @@ total_visit_wide <- total_visit_pa %>%
 
 # Export
 write.csv(total_visit_wide, file="2 - Cleaned/SR matrices/total_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 # 1.12 Yards
@@ -86,11 +87,12 @@ total_yard_wide <- total %>%
 
 # Export
 write.csv(total_yard_wide, file="2 - Cleaned/SR matrices/total_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
-# --- 1.2 MIGRATORY_2024 --- ####
+
+
+# --- 1.2 MIGRATORY_2024 --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -113,7 +115,6 @@ m24_visit_wide <- m24_visit_pa %>%
 
 # Export
 write.csv(m24_visit_wide, file="2 - Cleaned/SR matrices/m24_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 # 1.22 Yards
@@ -130,11 +131,13 @@ m24_yard_wide <- migratory_2024 %>%
 
 # Export
 write.csv(m24_yard_wide, file="2 - Cleaned/SR matrices/m24_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
-# --- 1.3 MIGRATORY_2025 --- ####
+
+
+
+# --- 1.3 MIGRATORY_2025 --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -157,7 +160,7 @@ m25_visit_wide <- m25_visit_pa %>%
 
 # Export
 write.csv(m25_visit_wide, file="2 - Cleaned/SR matrices/m25_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # 1.32 Yards
@@ -174,11 +177,12 @@ m25_yard_wide <- migratory_2025 %>%
 
 # Export
 write.csv(m25_yard_wide, file="2 - Cleaned/SR matrices/m25_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
-# --- 1.4 MIGRATORY --- ####
+
+
+# --- 1.4 MIGRATORY --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -201,7 +205,7 @@ m_visit_wide <- m_visit_pa %>%
 
 # Export
 write.csv(m_visit_wide, file="2 - Cleaned/SR matrices/m_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # 1.42 Yards
@@ -218,11 +222,13 @@ m_yard_wide <- migratory %>%
 
 # Export
 write.csv(m_yard_wide, file="2 - Cleaned/SR matrices/m_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
-# --- 1.5 BREEDING_2024 --- ####
+
+
+
+# --- 1.5 BREEDING_2024 --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -245,7 +251,7 @@ b24_visit_wide <- b24_visit_pa %>%
 
 # Export
 write.csv(b24_visit_wide, file="2 - Cleaned/SR matrices/b24_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # 1.52 Yards
@@ -262,11 +268,13 @@ b24_yard_wide <- breeding_2024 %>%
 
 # Export
 write.csv(b24_yard_wide, file="2 - Cleaned/SR matrices/b24_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
-# --- 1.6 BREEDING_2025 --- ####
+
+
+
+# --- 1.6 BREEDING_2025 --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -289,7 +297,7 @@ b25_visit_wide <- b25_visit_pa %>%
 
 # Export
 write.csv(b25_visit_wide, file="2 - Cleaned/SR matrices/b25_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
+
 
 
 # 1.62 Yards
@@ -306,14 +314,14 @@ b25_yard_wide <- breeding_2025 %>%
 
 # Export
 write.csv(b25_yard_wide, file="2 - Cleaned/SR matrices/b25_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
 
 
 
-# --- 1.7 BREEDING --- ####
+
+# --- 1.7 BREEDING --- #
 # DEF: Creation of two wide data frames: one with visits as rows and the other 
 # with yards as rows.
 
@@ -336,7 +344,6 @@ b_visit_wide <- b_visit_pa %>%
 
 # Export
 write.csv(b_visit_wide, file="2 - Cleaned/SR matrices/b_visit_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 # 1.72 Yards
@@ -353,7 +360,6 @@ b_yard_wide <- breeding %>%
 
 # Export
 write.csv(b_yard_wide, file="2 - Cleaned/SR matrices/b_yard_wide.csv", row.names=FALSE)
-# moved to ~/Desktop/Jess_Honours/4 - Output/SR matrices
 
 
 
@@ -389,7 +395,7 @@ b_yard_wide_clean <- subset(b_yard_wide, select = -c(`NA`, Unknown))
 # 2.2 Create function to calculate yard species richness from wide data frame
 yard_richness <- function(yard_wide) {
   yard_wide %>%
-    mutate(richness = rowSums(across(-Code))) %>% # -Unknown, -`NA`
+    mutate(richness = rowSums(across(-Code))) %>%
     select(Code, richness)
 }
 
