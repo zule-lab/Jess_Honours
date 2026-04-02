@@ -13,7 +13,7 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 
-
+options(readr.show_col_types = FALSE)
 
 # ============================================================================ # 
 # 1. SPECIES RICHNESS ACROSS SEASONS
@@ -258,7 +258,7 @@ yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
 
 # Select only relevant columns from yard_characteristics
 yard_features <- yard_characteristics %>% 
-  select(area,shrub,tree,density,mean_dbh,n_fruiting_plants,n_native_plants)
+  select(area,shrub,tree,density,mean_dbh,proportion_fruit,proportion_native)
 
 # Calculate n, mean, SD, and range for yard features and create new data frame
 summary_yard_features <- as.data.frame( # return data frame, not matrix
@@ -322,13 +322,38 @@ ggplot(species_abundance,
 
 
 # ============================================================================ # 
-# LANDSCAPE HABITAT FEATURES  
+# 4. LANDSCAPE HABITAT FEATURES  
 # ============================================================================ # 
 
-# --- 4. insert --- #
+# --- 4. SUMMARY STATISTICS --- #
 
+# 4.1 Find mean, range, and SD of the following:
+# •	Average area
+# •	Number of trees
+# •	Number of shrubs
+# •	Tree density
+# •	Shrub density
+# •	Average DBH
+# •	Number of big trees
+# •	Number of fruiting plants
 
+# Import data
+landscape_characteristics <- read_csv("2 - Cleaned/landscape_characteristics.csv")
 
+# Select only relevant columns from yard_characteristics
+only_landscape_characteristics <- landscape_characteristics %>% 
+  select(-Yard.Code)
+
+# Calculate n, mean, SD, and range for yard features and create new data frame
+summary_landscape_features <- as.data.frame( # return data frame, not matrix
+  rbind( # count non-NA observations for n, and remove NA observations for each variable+
+    n    = colSums(!is.na(only_landscape_characteristics)), # count number of valid observations
+    mean = apply(only_landscape_characteristics, 2, function(x) mean(x, na.rm = TRUE)), 
+    sd   = apply(only_landscape_characteristics, 2, function(x) sd(x, na.rm = TRUE)), 
+    min  = apply(only_landscape_characteristics, 2, function(x) min(x, na.rm = TRUE)), 
+    max  = apply(only_landscape_characteristics, 2, function(x) max(x, na.rm = TRUE)) 
+  )
+)
 
 
 
