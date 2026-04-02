@@ -340,9 +340,11 @@ ggplot(species_abundance,
 # Import data
 landscape_characteristics <- read_csv("2 - Cleaned/landscape_characteristics.csv")
 
+?read_csv()
+
 # Select only relevant columns from yard_characteristics
 only_landscape_characteristics <- landscape_characteristics %>% 
-  select(-Yard.Code)
+  select(-Yard.Code, -SR_total, -SR_mig, -SR_mig_2024, -SR_mig_2025, -SR_breed, -SR_breed_2024, -SR_breed_2025)
 
 # Calculate n, mean, SD, and range for yard features and create new data frame
 summary_landscape_features <- as.data.frame( # return data frame, not matrix
@@ -354,7 +356,7 @@ summary_landscape_features <- as.data.frame( # return data frame, not matrix
     max  = apply(only_landscape_characteristics, 2, function(x) max(x, na.rm = TRUE)) 
   )
 )
-
+summary_landscape_features
 
 
 

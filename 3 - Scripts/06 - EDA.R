@@ -97,6 +97,8 @@ multi_hist_SR
 
 
 
+
+
 # --- 1.2 YARD HABITAT FEATURES --- #
 # DEF: Make histograms for each yard habitat feature
 
@@ -165,8 +167,22 @@ multi_hist_yard_characteristics
 
 
 # --- 1.3 LANDSCAPE CHARACTERISTICS --- #
+# DEF: make histograms and boxplots of vegetation cover to observe distribution
+landscape_characteristics_long <- read_csv("2 - Cleaned/landscape_characteristics_long.csv")
 
-# INSERT
+# 1.31 Boxplot for vegetation cover above 3 m (canopy)
+ggplot(data = landscape_characteristics_long) + 
+  geom_boxplot(mapping = aes(x = Type_Scale, y=Cover, fill = Type_Scale)) + 
+  theme_bw()
+
+# 1.32 Histogram for vegetation cover above 3 m (canopy)
+ggplot(data = landscape_characteristics_long) + geom_histogram(mapping = aes(x=Cover)) + 
+  theme_bw() +
+  facet_wrap(~Type_Scale, nrow=2) + 
+  labs(x = "Vegetation cover", y = "Frequency")
+
+
+
 
 
 
@@ -177,20 +193,8 @@ multi_hist_yard_characteristics
 # --- 2.1 SR ~ YARD HABITAT FEATURES --- #
 # DEF: Scatter plots of yard habitat features with species richness for each season
 
-# 2.11 Make long data frame for each variable with each season's SR
-yard_characteristics_long <- yard_characteristics %>%
-  # remove spatial variables
-  select(-c(back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,
-            long_radius_m,lat,long,utm_zone,utm_easting,utm_northing)) %>%
-  pivot_longer(
-    cols = starts_with("SR_"), # select columns starting with SR_
-    names_to = "season", # name of new column to store old column names
-    values_to = "richness" # name of new column to store values
-  )
-
-# Export yard_characteristics_long data frame
-write.csv(yard_characteristics_long, file="2 - Cleaned/yard_characteristics_long.csv", row.names=FALSE)
-
+# 2.11 Import long data frame for each variable with each season's SR
+yard_characteristics_long <- read_csv("2 - Cleaned/yard_characteristics_long.csv")
 
  # 2.12 SR ~ Area
 ggplot(data = yard_characteristics_long) + 
@@ -258,14 +262,74 @@ ggplot(data = yard_characteristics_long) +
 
 
 
-# --- 2.2. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# ggplot relationships
+# --- 2.2 SR ~ LANDSCAPE HABITAT FEATURES --- #
+# DEF: scatter plots of landscape habitat features with SR for each season
+landscape_characteristics_split <- read_csv("2 - Cleaned/yard_characteristics_split.csv")
+
+# 2.21 SR ~ Cover above 3 m
+# 25 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = high_canopy_25m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Canopy - 25m", y = "Species richness")
+# 50 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = high_canopy_50m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Canopy - 50m", y = "Species richness")
+# 100 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = high_canopy_100m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Canopy - 100m", y = "Species richness")
+# 200 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = high_canopy_200m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Canopy - 200m", y = "Species richness")
+# 400 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = high_canopy_400m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Canopy - 400m", y = "Species richness")
 
 
-
-# --- 2.3. SR ~ LANDSCAPE HABITAT FEATURES --- #
-# ggplot relationships
-
+# 2.22 SR ~ Cover below 3 m
+# 25 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = low_canopy_25m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Understory - 25m", y = "Species richness")
+# 50 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = low_canopy_50m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Understory - 50m", y = "Species richness")
+# 100 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = low_canopy_100m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Understory - 100m", y = "Species richness")
+# 200 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = low_canopy_200m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Understory - 200m", y = "Species richness")
+# 400 m
+ggplot(data = landscape_characteristics_split) + 
+  geom_point(mapping = aes(x = low_canopy_400m, y = richness)) + 
+  theme_bw() +
+  facet_wrap(~season, nrow=2) + 
+  labs(x = "Understory - 400m", y = "Species richness")
 
 
 
