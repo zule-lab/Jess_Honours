@@ -15,7 +15,6 @@ library(readr)
 library(tidyverse)
 library(dplyr)
 library(stringr)
-library(stringr)
 library(ggplot2)
 library(itsadug)
 library(mgcv)
@@ -30,60 +29,9 @@ library(patchwork)
 
 # --- 1.1 LANDSCAPE CHARACTERISTICS DATA FRAME PREPARATION --- #
 
-# Build data frame for canopy 
-# I need a data frame with: 
-#   Yard.Code
-#   Variable 4 (canopy cover below 3 m)
-#   Variable 5 (canopy cover above 3 m)
-#   Season
-#   Year ---- I THINK I WILL ACTUALLY IGNORE YEAR IN THIS ONE
-#   Richness
+landscape_characteristics_long <- read_csv("2 - Cleaned/landscape_characteristics_long.csv")
 
-
-
-# 1.11 Remove unnecessary variables from canopy_output data frame
-canopy_output <- read_csv("1 - Input/canopy_output.csv")
-
-canopy_cleaned <- canopy_output %>%
-  # select class 3 (canopy below 3 m) and class 4 (canopy above 3 m) variables
-  select(Yard.Code, starts_with("indice660_class3"), starts_with("indice660_class4")) %>%
-  # remove indice660_ prefix of columns
-  rename_with(~ str_remove(.x,"^indice660_")) %>%
-  # rename class3 columns (canopy below 3 m) for clarity
-  rename_with(~ str_replace(.x, "^class3_", "low_canopy_"), .cols = contains("class3")) %>%
-  # rename class4 columns (canopy above 3 m) for clarity
-  rename_with(~ str_replace(.x, "^class4_", "high_canopy_"), .cols = contains("class4"))
-
-
-
-# 1.12 Bind species richness data for each period with canopy data
-SR_wide <- read_csv("2 - Cleaned/SR_wide.csv")
-
-# Create landscape characteristics data frame
-landscape_characteristics <- Reduce(
-  function(x, y) full_join(x, y, by = "Yard.Code"),
-  list(canopy_cleaned,SR_wide))
-
-
-
-# 1.13 Clean landscape data frame
-landscape_characteristics_long <- landscape_characteristics %>%
-  # remove unnecessary SR variables
-  select(-c(SR_total, SR_mig_2024, SR_mig_2025, SR_breed_2024, SR_breed_2025)) %>%
-  # split richness and season in to different columns
-  pivot_longer(
-    cols = starts_with("SR_"), # select columns starting with SR_
-    names_to = "season", # name of new column to store old column names
-    values_to = "richness") %>% # name of new column to store values
-  # rename seasons for clarity
-  mutate(season = case_when(str_detect(season,"SR_mig") ~ "migration",
-                            str_detect(season, "SR_breed") ~ "breeding"))
-
-
-
-# --- 1.2 LANDSCAPE CHARACTERISTICS DATA FRAME PREPARATION --- #
-
-# 1.21 Create data frame for GAM model
+# 1.11 Create data frame for GAM model
 canopy_GAM_df <- landscape_characteristics_long %>%
   # convert columns to correct class
   mutate(Yard.Code = as.factor(Yard.Code), 
@@ -104,7 +52,7 @@ canopy_GAM_df <- landscape_characteristics_long %>%
 
 
 
-# 1.22 Create data frames for each season (migration, breeding)
+# 1.12 Create data frames for each season (migration, breeding)
 canopy_migration_GAM_df <- canopy_GAM_df %>%
   filter(season %in% c("migration")) # select migration data
 
