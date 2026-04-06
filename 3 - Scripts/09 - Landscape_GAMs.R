@@ -1,6 +1,6 @@
 # 18-Mar-2026                          
 # ============================================================================ # 
-#                              SR ~ CANOPY & SCALE
+#                              SCALE OF EFFECT ANALYSIS
 # ============================================================================ # 
 
 # DESCRIPTION: 
@@ -29,10 +29,10 @@ library(patchwork)
 
 # --- 1.1 LANDSCAPE CHARACTERISTICS DATA FRAME PREPARATION --- #
 
-landscape_characteristics_long <- read_csv("2 - Cleaned/landscape_characteristics_long.csv")
+landscape_characteristics_split <- read_csv("2 - Cleaned/landscape_characteristics_split.csv")
 
 # 1.11 Create data frame for GAM model
-canopy_GAM_df <- landscape_characteristics_long %>%
+canopy_GAM_df <- landscape_characteristics_split %>%
   # convert columns to correct class
   mutate(Yard.Code = as.factor(Yard.Code), 
          season = as.factor(season),
@@ -115,7 +115,6 @@ mig_25m_veg_GAM <- gam(richness ~
                        data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_25m_veg_GAM)
-
 concurvity(mig_25m_veg_GAM)
 
 # Just canopy layer
@@ -124,7 +123,6 @@ mig_25m_canopy_GAM <- gam(richness ~
                           data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_25m_canopy_GAM)
-
 concurvity(mig_25m_canopy_GAM)
 
 
@@ -137,7 +135,6 @@ mig_50m_veg_GAM <- gam(richness ~
                           data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_50m_veg_GAM)
-
 concurvity(mig_50m_veg_GAM) #highly concurve
 
 # Just canopy 
@@ -146,7 +143,6 @@ mig_50m_canopy_GAM <- gam(richness ~
                           data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_50m_canopy_GAM)
-
 concurvity(mig_50m_canopy_GAM)
 
 
@@ -198,7 +194,6 @@ mig_400m_veg_GAM <- gam(richness ~
                            data = canopy_migration_GAM_df, method = "REML")
 
 summary(mig_400m_veg_GAM)
-
 concurvity(mig_400m_veg_GAM) # highly concurve
 
 # Just canopy
@@ -211,11 +206,20 @@ concurvity(mig_400m_canopy_GAM)
 
 
 
-###### AIC SELECTION
-AIC_mig_veg_GAM <- AIC(mig_25m_veg_GAM, mig_50m_veg_GAM, mig_100m_veg_GAM, mig_200m_veg_GAM, mig_400m_veg_GAM)
+
+# --- 2.8 AIC MODEL SELECTION --- #
+AIC_mig_veg_GAM <- AIC(mig_25m_veg_GAM, 
+                       mig_50m_veg_GAM, 
+                       mig_100m_veg_GAM, 
+                       mig_200m_veg_GAM, 
+                       mig_400m_veg_GAM)
 AIC_mig_veg_GAM
 
-AIC_mig_canopy_GAM <- AIC(mig_25m_canopy_GAM, mig_50m_canopy_GAM, mig_100m_canopy_GAM, mig_200m_canopy_GAM, mig_400m_canopy_GAM)
+AIC_mig_canopy_GAM <- AIC(mig_25m_canopy_GAM, 
+                          mig_50m_canopy_GAM, 
+                          mig_100m_canopy_GAM, 
+                          mig_200m_canopy_GAM, 
+                          mig_400m_canopy_GAM)
 AIC_mig_canopy_GAM
 
 
@@ -324,7 +328,8 @@ summary(bre_400m_canopy_GAM)
 concurvity(bre_400m_canopy_GAM) # highly concurve
 
 
-###### AIC SELECTION
+
+# --- 3.8 AIC MODEL SELECTION --- #
 
 AIC_bre_veg_GAM <- AIC(bre_25m_veg_GAM, 
                        bre_50m_veg_GAM, 
@@ -341,15 +346,12 @@ AIC_bre_canopy_GAM <- AIC(bre_25m_canopy_GAM,
 AIC_bre_canopy_GAM
 
 
+# Conclusions: no true scale of effect in breeding or migration, and results are
+# slightly contrary to our hypotheses
 
 
 
 
 
-
-
-# ============================================================================ # 
-# 4. (POSSIBLE) GAM 
-# ============================================================================ # 
 
 
