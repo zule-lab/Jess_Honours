@@ -20,7 +20,7 @@ library(itsadug)
 library(mgcv)
 library(gratia)
 library(patchwork)
-
+?itsadug
 
 
 # ============================================================================ # 
@@ -51,6 +51,7 @@ canopy_GAM_df <- landscape_characteristics_split %>%
   # mutate_if(is.numeric, .funs = list(scale = ~as.numeric(scale(.x))))
 
 
+write.csv(canopy_GAM_df, file="2 - Cleaned/canopy_GAM_df.csv", row.names=FALSE)
 
 # 1.12 Create data frames for each season (migration, breeding)
 canopy_migration_GAM_df <- canopy_GAM_df %>%

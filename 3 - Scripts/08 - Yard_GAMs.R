@@ -79,7 +79,7 @@ yard_GAM_df <- yard_characteristics_long %>%
   # scale all continuous variables between 2 and -2
   mutate_if(is.numeric, .funs = list(scale = ~as.numeric(scale(.x))))
 
-# Export yard_GAMM_df data frame
+# Export yard_GAM_df data frame
 write.csv(yard_GAM_df, file="2 - Cleaned/yard_GAM_df.csv", row.names=FALSE)
 
 
@@ -458,7 +458,11 @@ xlabels <- c("Area (m²)", "Number of trees",
              "Number of shrubs", "Mean DBH (cm)")
 season_cols <- c(
   migration = "#62B751",
-  breeding = "#07A1FF")
+  breeding = "#FF4A79")
+
+#season_cols <- c(
+  #migration = "#62B751",
+  #breeding = "#07A1FF")
 
 
 
@@ -580,31 +584,46 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
                 alpha = 0.25, colour = NA) + # colour=NA removes borders
     
     geom_point(data = yard_GAM_df, # add data points from original data
-               aes(x = .data[[var]], y = richness, colour = season),
+               aes(x = .data[[var]], y = richness, 
+                   colour = season,
+                   shape = season),
                inherit.aes = FALSE,
-               alpha = 0.5,
-               size = 0.75,
+               alpha = 0.75,
+               size = 1.0,
                position = position_jitter(width = 0.05, height = 0)) +
     
     # colour by season
-    scale_colour_manual(values = season_cols)+
-    scale_fill_manual(values = season_cols) +
+    scale_colour_manual(values = season_cols, name = "Season") +
+    scale_fill_manual(values = season_cols, name = "Season") +
+    scale_shape_manual(values = c(breeding = 16, migration = 17), name = "Season") +
     
+    # add shapes to legend
+    guides(
+      fill = "none",
+      colour = guide_legend(
+        override.aes = list(
+          fill = NA,          # removes the box
+          alpha = 1,          # removes transparency from ribbon
+          shape = c(16, 17),  # forces circle + triangle
+          size = 3)
+      )
+    ) +
+
     # add p value stars to plot
     geom_text(data = p_annot,
               aes(x = x, 
                   y = y,
-                  #colour=season,
+                  colour=season,
                   label = 
                     case_when(
-                      smooth_pvals < 0.001 ~ paste0("*** ","p = ", signif(smooth_pvals, 2)),
-                      smooth_pvals < 0.01  ~ paste0("** ","p = ", signif(smooth_pvals, 2)),
-                      smooth_pvals < 0.05  ~ paste0("* ","p = ", signif(smooth_pvals, 2)),
+                      smooth_pvals < 0.001 ~ paste0("p = ", signif(smooth_pvals, 2)),
+                      smooth_pvals < 0.01  ~ paste0("p = ", signif(smooth_pvals, 2)),
+                      smooth_pvals < 0.05  ~ paste0("p = ", signif(smooth_pvals, 2)),
                       TRUE ~ "")
               ),
               inherit.aes = FALSE,
               show.legend = FALSE,
-              size=3.0
+              size=3.
     ) +
     
     labs( # label axes
@@ -621,7 +640,7 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
 
 # Plot multi-panel figure of SR ~ yard habitat feature variables by season
 gam_fig_predictive_points <- wrap_plots(yard_GAM_figs_points, ncol = 2) +
-  plot_layout(guides = "collect") & theme(legend.position = "top")
+  plot_layout(guides = "collect") & theme(legend.position = "bottom")
 gam_fig_predictive_points
 
 

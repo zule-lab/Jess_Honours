@@ -167,6 +167,7 @@ write.csv(landscape_characteristics, "2 - Cleaned/landscape_characteristics.csv"
 
 
 # 1.13 Make split landscape data frame by splitting season and year
+# Split into: migration versus breeding
 landscape_characteristics_split <- landscape_characteristics %>%
   # remove unnecessary SR variables
   select(-c(SR_total, SR_mig_2024, SR_mig_2025, SR_breed_2024, SR_breed_2025)) %>%
@@ -181,6 +182,25 @@ landscape_characteristics_split <- landscape_characteristics %>%
 
 write.csv(landscape_characteristics_split, "2 - Cleaned/landscape_characteristics_split.csv", row.names = FALSE)
 
+# Split into: season by year
+landscape_characteristics_full <- landscape_characteristics %>%
+  # remove unnecessary SR variables
+  select(-c(SR_total, SR_mig, SR_breed)) %>%
+  # split richness and season into different columns
+  pivot_longer(
+    cols = starts_with("SR_"), # select columns starting with SR_
+    names_to = "season", # name of new column to store old column names
+    values_to = "richness") %>% # name of new column to store values
+  # split "season" column into 2 columns: season and year
+  mutate(year = str_extract(season, "\\d{4}"),
+         season = case_when(str_detect(season,"mig") ~ "migration",
+                            str_detect(season, "breed") ~ "breeding"),
+         season = as.factor(season))
+
+
+write.csv(landscape_characteristics_full, "2 - Cleaned/landscape_characteristics_full.csv", row.names = FALSE)
+
+
 
 # 1.14 Make long landscape characteristics data frame by stacking scales
 landscape_characteristics_long <- landscape_characteristics %>%
@@ -191,6 +211,5 @@ landscape_characteristics_long <- landscape_characteristics %>%
   )
 
 write.csv(landscape_characteristics_long, "2 - Cleaned/landscape_characteristics_long.csv", row.names = FALSE)
-
 
 
