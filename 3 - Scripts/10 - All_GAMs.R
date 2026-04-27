@@ -135,5 +135,3 @@ AIC_big_GAM <- AIC(yard_global_GAM,
                    combined_GAM, 
                    null_GAM)
 AIC_big_GAM
-
-

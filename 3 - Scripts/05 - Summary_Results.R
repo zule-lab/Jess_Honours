@@ -234,6 +234,7 @@ num_yards_per_species <- total_yard_wide %>%
     values_to = "number_of_yards"
   )
 
+mean(num_yards_per_species$number_of_yards)
 
 
 
@@ -317,6 +318,10 @@ ggplot(species_abundance,
   theme_bw()
 
 
+# 3.22 Find proportion of non-native species in yards
+mean(yard_plants_verified$Native == "yes", na.rm = TRUE)
+
+mean(yard_plants_verified$Native == "no", na.rm = TRUE)
 
 
 

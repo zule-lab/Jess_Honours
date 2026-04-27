@@ -20,7 +20,7 @@ library(itsadug)
 library(mgcv)
 library(gratia)
 library(patchwork)
-?itsadug
+library(tidyr)
 
 
 # ============================================================================ # 

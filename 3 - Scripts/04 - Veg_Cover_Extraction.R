@@ -8,22 +8,11 @@
 # in buffers (25m, 50m, 100m, 200m, 400m) around yards.
 
 # PACKAGES USED
-library(cancensus)
 library(sf)
 library(terra)
-# library(raster)
-library(plyr)
-library(ggplot2)
-library(amt)
-library(sp)
-library(landscapemetrics)
-library(purrr)
 library(dplyr)
-library(pdftools)
 library(tidyr)
 library(readr)
-library(lubridate)
-library(progressr)
 library(stringr)
 
 

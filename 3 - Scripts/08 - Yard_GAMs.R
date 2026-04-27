@@ -16,6 +16,7 @@ library(itsadug)
 library(mgcv)
 library(gratia)
 library(patchwork)
+library(tidyr)
 
 
 
@@ -616,9 +617,9 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
                   colour=season,
                   label = 
                     case_when(
-                      smooth_pvals < 0.001 ~ paste0("p = ", signif(smooth_pvals, 2)),
-                      smooth_pvals < 0.01  ~ paste0("p = ", signif(smooth_pvals, 2)),
-                      smooth_pvals < 0.05  ~ paste0("p = ", signif(smooth_pvals, 2)),
+                      smooth_pvals < 0.001 ~ paste0("p < 0.001"),
+                      smooth_pvals < 0.01  ~ paste0("p < 0.01 "),
+                      smooth_pvals < 0.05  ~ paste0("p < 0.05"),
                       TRUE ~ "")
               ),
               inherit.aes = FALSE,
@@ -628,11 +629,15 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
     
     labs( # label axes
       x = xlabels[i],
-      y = "Species richness",
+      y = "Predicted species richness",
       #title = paste("Effect of", var, "by season")
     ) +
     theme_classic() +
     theme(
+      legend.title = element_text(size = 14),
+      legend.text  = element_text(size = 12),
+      axis.title = element_text(size = 13),
+      axis.text  = element_text(size = 11)
       #legend.position = "top",
       #plot.title = element_text(face = "bold")
     )

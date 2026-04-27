@@ -67,6 +67,12 @@ corrplot(cor_matrix_landscape) # visual correlation matrix
 # This is probably because the buffers have a lot of spatial overlap with one another
 
 
+# NOTE: collinearity between scales of the same type of cover doesn't really 
+# matter because they are never in the same model anyway
+
+# So what we really see here is high collinearity between low and high canopy at 
+# some of the higher spatial scales due to spatial overlap most likely
+
 
 
 
