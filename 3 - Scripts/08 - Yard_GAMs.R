@@ -629,10 +629,10 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
     
     labs( # label axes
       x = xlabels[i],
-      y = "Predicted species richness",
+      y = "Predicted species richness"
       #title = paste("Effect of", var, "by season")
     ) +
-    theme_classic() +
+    theme_bw() +
     theme(
       legend.title = element_text(size = 14),
       legend.text  = element_text(size = 12),
