@@ -28,33 +28,33 @@ num_observations <- function(cleaned_df){
 
 # 1.11 Total
 cleaned_bird_data <- read_csv("2 - Cleaned/cleaned_bird_data.csv")
-n_total = num_observations(cleaned_bird_data)
+num_observations(cleaned_bird_data)
 
 # 1.12 Migration
 cleaned_migratory_data_2024 <- read_csv("2 - Cleaned/cleaned_migratory_data_2024.csv")
-n_mig24 = num_observations(cleaned_migratory_data_2024)
+num_observations(cleaned_migratory_data_2024)
 
 cleaned_migratory_data_2025 <- read_csv("2 - Cleaned/cleaned_migratory_data_2025.csv")
-n_mig25 = num_observations(cleaned_migratory_data_2025)
+num_observations(cleaned_migratory_data_2025)
 
 cleaned_migratory_data <- read_csv("2 - Cleaned/cleaned_migratory_data.csv")
-n_mig = num_observations(cleaned_migratory_data)
+num_observations(cleaned_migratory_data)
 
 # 1.13 Breeding
 cleaned_breeding_data_2024 <- read_csv("2 - Cleaned/cleaned_breeding_data_2024.csv")
-n_bre24 = num_observations(cleaned_breeding_data_2024)
+num_observations(cleaned_breeding_data_2024)
 
 cleaned_breeding_data_2025 <- read_csv("2 - Cleaned/cleaned_breeding_data_2025.csv")
-n_bre25 = num_observations(cleaned_breeding_data_2025)
+num_observations(cleaned_breeding_data_2025)
 
 cleaned_breeding_data <- read_csv("2 - Cleaned/cleaned_breeding_data.csv")
-n_bre = num_observations(cleaned_breeding_data)
+num_observations(cleaned_breeding_data)
 
 
 
 # --- 1.2 OVERALL SPECIES RICHNESS --- #
 
-# Function to find SR from presence-absence matrices
+# Function to find total possible SR by season from presence-absence matrices
 SR <- function(yard_wide){
   yard_wide = select(yard_wide,-any_of(c("Code","NA", "Unknown"))
   )
@@ -63,38 +63,31 @@ SR <- function(yard_wide){
 
 # 1.21 Total
 total_yard_wide <- read_csv("2 - Cleaned/SR matrices/total_yard_wide.csv")
-SR_total = SR(total_yard_wide)
-SR_total
+SR(total_yard_wide)
 
 # 1.22 Migration
 m24_yard_wide <- read_csv("2 - Cleaned/SR matrices/m24_yard_wide.csv")
-SR_mig24 = SR(m24_yard_wide)
-SR_mig24
+SR(m24_yard_wide)
 
 m25_yard_wide <- read_csv("2 - Cleaned/SR matrices/m25_yard_wide.csv")
-SR_mig25 = SR(m25_yard_wide)
-SR_mig25
+SR(m25_yard_wide)
 
 m_yard_wide <- read_csv("2 - Cleaned/SR matrices/m_yard_wide.csv")
-SR_mig = SR(m_yard_wide)
-SR_mig
+SR(m_yard_wide)
 
 # 1.23 Breeding
 b24_yard_wide <- read_csv("2 - Cleaned/SR matrices/b24_yard_wide.csv")
-SR_bre24 = SR(b24_yard_wide)
-SR_bre24
+SR(b24_yard_wide)
 
 b25_yard_wide <- read_csv("2 - Cleaned/SR matrices/b25_yard_wide.csv")
-SR_bre25 = SR(b25_yard_wide)
-SR_bre25
+SR(b25_yard_wide)
 
 b_yard_wide <- read_csv("2 - Cleaned/SR matrices/b_yard_wide.csv")
-SR_bre = SR(b_yard_wide)
-SR_bre
+SR(b_yard_wide)
 
 
 
-# --- 1.3 AVERAGE SPECIES RICHNESS PER YARD --- #
+# --- 1.3 AVERAGE SPECIES RICHNESS IN YARDS --- #
 
 # Function to find average species richness per yard
 avgSR_yard <- function(long_df,season){
@@ -107,32 +100,96 @@ avgSR_yard <- function(long_df,season){
 SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
 # 1.31 Total
-avgSR_yard_total = avgSR_yard(SR_long, season="total")
-avgSR_yard_total
+avgSR_yard(SR_long, season="total")
 
 # 1.32 Migration
-avgSR_yard_m24 = avgSR_yard(SR_long, season="mig_2024")
-avgSR_yard_m24
+avgSR_yard(SR_long, season="mig_2024")
 
-avgSR_yard_m25 = avgSR_yard(SR_long, season="mig_2025")
-avgSR_yard_m25
+avgSR_yard(SR_long, season="mig_2025")
 
-avgSR_yard_m = avgSR_yard(SR_long, season="mig_total")
-avgSR_yard_m
+avgSR_yard(SR_long, season="mig_total")
 
 # 1.33 Breeding
-avgSR_yard_bre24 = avgSR_yard(SR_long, season="breed_2024")
-avgSR_yard_bre24
+avgSR_yard(SR_long, season="breed_2024")
 
-avgSR_yard_bre25 = avgSR_yard(SR_long, season="breed_2025")
-avgSR_yard_bre25
+avgSR_yard(SR_long, season="breed_2025")
 
-avgSR_yard_bre = avgSR_yard(SR_long, season="breed_total")
-avgSR_yard_bre
+avgSR_yard(SR_long, season="breed_total")
 
 
 
-# --- 1.4 AVERAGE SPECIES RICHNESS PER VISIT --- #
+
+# --- 1.4 STANDARD DEVIATION/ERROR OF SPECIES RICHNESS IN YARDS --- #
+
+# Function to find standard deviation of species richness per yard
+sdSR_yard <- function(long_df,season){
+  season_long = long_df[long_df$dataset==season,]
+  sd_SR = sd(season_long$richness)
+  return(sd_SR)
+}
+
+# Load data
+SR_long <- read_csv("2 - Cleaned/SR_long.csv")
+
+# 1.41 Total
+sdSR_yard(SR_long, season="total") #SD
+sdSR_yard_total / sqrt(22) #SE (n = 22 yards)
+
+# 1.42 Migration
+sdSR_yard(SR_long, season="mig_2024") # SD
+sdSR_yard_m24 / sqrt(22) #SE (n = 22 yards)
+
+sdSR_yard(SR_long, season="mig_2025") # SD
+sdSR_yard_m25 / sqrt(22) #SE (n = 22 yards)
+
+sdSR_yard(SR_long, season="mig_total") #SD
+sdSR_yard_m / sqrt(22) #SE (n = 22 yards)
+
+# 1.43 Breeding
+sdSR_yard(SR_long, season="breed_2024") #SD
+sdSR_yard_bre24 / sqrt(22) #SE (n = 22 yards)
+
+sdSR_yard(SR_long, season="breed_2025") #SD
+sdSR_yard_bre25 / sqrt(22) #SE (n = 22 yards)
+
+sdSR_yard(SR_long, season="breed_total") #SD
+sdSR_yard_bre / sqrt(22) #SE (n = 22 yards)
+
+remove()
+
+# --- 1.5 RANGE OF SPECIES RICHNESS IN YARDS --- #
+
+# Function to find standard deviation of species richness per yard
+rangeSR_yard <- function(long_df,season){
+  season_long = long_df[long_df$dataset==season,]
+  range_SR = range(season_long$richness)
+  return(range_SR)
+}
+
+# Load data
+SR_long <- read_csv("2 - Cleaned/SR_long.csv")
+
+# 1.51 Total
+rangeSR_yard(SR_long, season="total")
+
+# 1.52 Migration
+rangeSR_yard(SR_long, season="mig_2024")
+
+rangeSR_yard(SR_long, season="mig_2025")
+
+rangeSR_yard(SR_long, season="mig_total")
+
+# 1.53 Breeding
+rangeSR_yard(SR_long, season="breed_2024")
+
+rangeSR_yard(SR_long, season="breed_2025")
+
+rangeSR_yard(SR_long, season="breed_total")
+
+
+
+
+# --- 1.6 AVERAGE SPECIES RICHNESS PER VISIT --- #
 
 # Function to find average number of species seen in yard survey
 avgSR_visit <- function(visit_wide) {
@@ -142,29 +199,29 @@ avgSR_visit <- function(visit_wide) {
   return(mean(richness))
 }
 
-# 1.41 Total
+# 1.61 Total
 total_visit_wide <- read_csv("2 - Cleaned/SR matrices/total_visit_wide.csv")
-avgSR_visit_total = avgSR_visit(total_visit_wide)
+avgSR_visit(total_visit_wide)
 
-# 1.42 Migration
+# 1.62 Migration
 m24_visit_wide <- read_csv("2 - Cleaned/SR matrices/m24_visit_wide.csv")
-avgSR_visit_mig24 = avgSR_visit(m24_visit_wide)
+avgSR_visit(m24_visit_wide)
 
 m25_visit_wide <- read_csv("2 - Cleaned/SR matrices/m25_visit_wide.csv")
-avgSR_visit_mig25 = avgSR_visit(m25_visit_wide)
+avgSR_visit(m25_visit_wide)
 
 m_visit_wide <- read_csv("2 - Cleaned/SR matrices/m_visit_wide.csv")
-avgSR_visit_mig = avgSR_visit(m_visit_wide)
+avgSR_visit(m_visit_wide)
 
-# 1.43 Breeding
+# 1.63 Breeding
 b24_visit_wide <- read_csv("2 - Cleaned/SR matrices/b24_visit_wide.csv")
-avgSR_visit_bre24 = avgSR_visit(b24_visit_wide)
+avgSR_visit(b24_visit_wide)
 
 b25_visit_wide <- read_csv("2 - Cleaned/SR matrices/b25_visit_wide.csv")
-avgSR_visit_bre25 = avgSR_visit(b25_visit_wide)
+avgSR_visit(b25_visit_wide)
 
 b_visit_wide <- read_csv("2 - Cleaned/SR matrices/b_visit_wide.csv")
-avgSR_visit_bre = avgSR_visit(b_visit_wide)
+avgSR_visit(b_visit_wide)
 
 
 
@@ -195,14 +252,21 @@ standardize <- function(df, species_list){
 # Standardize every season to have all 44 species and remove Code column
 m24_standardized = standardize(m24_yard_wide,bird_code_list)
 m25_standardized = standardize(m25_yard_wide,bird_code_list)
+m_standardized = standardize(m_yard_wide,bird_code_list)
 b24_standardized = standardize(b24_yard_wide,bird_code_list)
 b25_standardized = standardize(b25_yard_wide,bird_code_list)
+b_standardized = standardize(b_yard_wide,bird_code_list)
+total_standardized = standardize(total_yard_wide,bird_code_list)
 
 # Find species present for each season
 m24_pres <- as.integer(colSums(m24_standardized) > 0)
 m25_pres <- as.integer(colSums(m25_standardized) > 0)
+m_pres <- as.integer(colSums(m_standardized) > 0)
 b24_pres <- as.integer(colSums(b24_standardized) > 0)
 b25_pres <- as.integer(colSums(b25_standardized) > 0)
+b_pres <- as.integer(colSums(b_standardized) > 0)
+total_pres <- as.integer(colSums(total_standardized) > 0)
+
 
 # Build species presence by season table
 species_pres_by_seasons <- data.frame(
@@ -210,7 +274,10 @@ species_pres_by_seasons <- data.frame(
   m24 = m24_pres,
   m25 = m25_pres,
   b24 = b24_pres,
-  b25 = b25_pres
+  b25 = b25_pres,
+  m = m_pres,
+  b = b_pres,
+  total = total_pres
 )
 
 
@@ -223,10 +290,8 @@ species_pres_by_seasons <- data.frame(
 num_yards_per_species <- total_yard_wide %>%
   # remove the yard ID column
   select(-Code) %>%
-  
   # sum each column (each species)
   summarise(across(everything(), ~ sum(.x, na.rm = TRUE))) %>%
-  
   # convert from wide to long format
   pivot_longer(
     cols = everything(),
@@ -234,7 +299,10 @@ num_yards_per_species <- total_yard_wide %>%
     values_to = "number_of_yards"
   )
 
-mean(num_yards_per_species$number_of_yards)
+mean(num_yards_per_species$number_of_yards) # mean
+sd(num_yards_per_species$number_of_yards) # standard deviation
+range(num_yards_per_species$number_of_yards) # range
+sd(num_yards_per_species$number_of_yards) / sqrt(22) # standard error (n = 22 yards)
 
 
 
@@ -282,14 +350,10 @@ yard_trees_verified <- read_csv("2 - Cleaned/yard_trees_verified.csv")
 
 # Abundance of plant species by counting frequency of species code
 species_abundance <- yard_trees_verified %>%
-  count(Species.Code, Plant.sci, name = "abundance")
-
-# Calculate percentage of total records
-species_abundance <- species_abundance %>%
-  mutate(percent = 100 * abundance / sum(abundance))
-
-# Rank species by abundance
-species_abundance <- species_abundance %>%
+  count(Species.Code, Plant.sci, name = "abundance") %>%
+  # Calculate percentage of total records
+  mutate(percent = 100 * abundance / sum(abundance)) %>%
+  # Rank species by abundance
   arrange(desc(abundance)) %>%
   mutate(rank = row_number())
 
@@ -302,7 +366,7 @@ ggplot(species_abundance,
        title = "Plant species abundance across backyards") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
-# why does ULPU do that :'(
+# why does ULPU do that :(
 
 # Rank-abundance curve
 ggplot(species_abundance,
@@ -319,9 +383,8 @@ ggplot(species_abundance,
 
 
 # 3.22 Find proportion of non-native species in yards
-mean(yard_plants_verified$Native == "yes", na.rm = TRUE)
-
-mean(yard_plants_verified$Native == "no", na.rm = TRUE)
+mean(yard_trees_verified$Native == "yes", na.rm = TRUE)
+mean(yard_trees_verified$Native == "no", na.rm = TRUE)
 
 
 
