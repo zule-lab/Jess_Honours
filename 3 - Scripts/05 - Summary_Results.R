@@ -27,8 +27,8 @@ num_observations <- function(cleaned_df){
 }
 
 # 1.11 Total
-cleaned_yard_data <- read_csv("2 - Cleaned/cleaned_yard_data.csv")
-n_total = num_observations(cleaned_yard_data)
+cleaned_bird_data <- read_csv("2 - Cleaned/cleaned_bird_data.csv")
+n_total = num_observations(cleaned_bird_data)
 
 # 1.12 Migration
 cleaned_migratory_data_2024 <- read_csv("2 - Cleaned/cleaned_migratory_data_2024.csv")

@@ -30,10 +30,9 @@ data_2025 <- read_csv("1 - Input/ndg_cleaneddata_2025.csv")
 yard_data_2025 <- data_2025[data_2025$Landtype=="yard",]
 
 # --- 1.3 NEW DATA FRAME --- #
-# Export a new data frame with just yard data from all years
-cleaned_yard_data <- rbind(yard_data_2024, yard_data_2025)
-write.csv(cleaned_yard_data, file="2 - Cleaned/cleaned_yard_data.csv", row.names=FALSE)
-
+# Export a new data frame with just bird survey data from yards in all years
+cleaned_bird_data <- rbind(yard_data_2024, yard_data_2025)
+write.csv(cleaned_bird_data, file="2 - Cleaned/cleaned_bird_data.csv", row.names=FALSE)
 
 # ============================================================================ # 
 # 2. MIGRATORY PERIOD
