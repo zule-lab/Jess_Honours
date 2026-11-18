@@ -11,9 +11,6 @@
 library(readr)
 library(tidyverse)
 
-# PROBLEMS I am currently having:
-# **yards: Y50 is missing from the tree data
-
 
 # ============================================================================ # 
 # 1. YARD MEASUREMENTS
@@ -39,7 +36,7 @@ centroid_data <- centroid_data[rowSums(is.na(centroid_data)) != ncol(centroid_da
 
 
 
-# --- 1.2 AREA ** --- #
+# --- 1.2 AREA --- #
 
 # DEF: Total yard area (front and backyards) from Kayleigh Hutt-Taylor's work, 
 # included in centroid data. 
@@ -53,9 +50,7 @@ centroid_data$area <- centroid_data$area*10000
 # 2. TREES AND SHRUBS: COUNT, DENSITY, DBH, & FRUITS
 # ============================================================================ # 
 
-##### PROBLEM: NOA'S YARD HAS NO TREES OR SHRUBS??? ASK MACKENZIE
-
-# --- 2.1 NUMBER OF TREES AND SHRUBS PER YARD --- # ** ***
+# --- 2.1 NUMBER OF TREES AND SHRUBS PER YARD ---
 
 # DEF: Count the number of trees and shrubs in yards from yard_trees_verified
 # I differentiated between trees and shrubs based on species, size, and stem number.
@@ -84,7 +79,7 @@ tree_shrub_count <- yard_trees_verified %>%
 
 # --- 2.2 TREE AND SHRUB DENSITY --- #
 
-# DEF: Calculated the density of vegetation (tree + shrubs) in backyards based on 
+# DEF: Calculated the density of vegetation (tree + shrubs per m) in backyards based on 
 # their area.
 
 # Join area with tree_shrub_count for density calculation

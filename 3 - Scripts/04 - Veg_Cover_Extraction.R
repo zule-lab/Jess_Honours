@@ -24,7 +24,8 @@ library(stringr)
 
 # https://observatoire.cmm.qc.ca/produits/donnees-georeferencees/#indice_canopee
 # Load spatial data as a raster from IndiceCanopee
-indice_660.ras <- rast("2 - Cleaned/660_IndiceCanopee_2023.tif")
+indice_660.ras <- rast("1 - Input/IndiceCanopee_2023.tif")
+# File is stored in .gitignore due to its size
 
 
 # --- 1.2. YARD CENTROIDS --- #
