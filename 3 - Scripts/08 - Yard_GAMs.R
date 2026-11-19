@@ -39,21 +39,10 @@ library(tidyr)
 #   proportion_native: numeric
 #### NOTE: each numeric variable has a scaled version ("variable_scale")
 
-# 1.12 Prepare long data frame from yard_characteristics_long.csv
-# Long data frame for each variable with each season's SR
-yard_characteristics <- read_csv("2 - Cleaned/yard_characteristics.csv")
+# 1.12 Prepare GAM data frame from yard_characteristics_long.csv
 
-yard_characteristics_long <- yard_characteristics %>%
-  # remove spatial variables
-  select(-c(back_perimeter_m,diagonal_1_m,diagonal_2_m,short_radius_m,
-            long_radius_m,lat,long,utm_zone,utm_easting,utm_northing)) %>%
-  pivot_longer(
-    cols = starts_with("SR_"), # select columns starting with SR_
-    names_to = "season", # name of new column to store old column names
-    values_to = "richness" # name of new column to store values
-  )
-# yard_characteristics_long <- read_csv("2 - Cleaned/yard_characteristics_long.csv")
-
+# Load long data frame for each variable with each season's SR
+yard_characteristics_long <- read_csv("2 - Cleaned/yard_characteristics_long.csv")
 
 # Create data frame for GAM model
 yard_GAM_df <- yard_characteristics_long %>%
@@ -89,7 +78,7 @@ write.csv(yard_GAM_df, file="2 - Cleaned/yard_GAM_df.csv", row.names=FALSE)
 
 
 # ============================================================================ # 
-# 2. GLOBAL GAM
+# 2. SEASON & YARD HABITAT FEATURES GAM
 # ============================================================================ # 
 
 # --- 2.1 QUESTION & HYPOTHESIS --- #
@@ -142,44 +131,64 @@ write.csv(yard_GAM_df, file="2 - Cleaned/yard_GAM_df.csv", row.names=FALSE)
 #   proportion_native_scale: numeric
 
 # 2.32 Global GAM
-yard_global_GAM <- gam(richness ~ season + 
+
+# Poisson family
+yard_global_GAM_poi <- gam(richness ~ season + 
+                            s(area_scale, by = season, k = 5) + 
+                            s(tree_scale, by = season, k = 5) + 
+                            s(shrub_scale, by = season, k = 5) + 
+                            s(mean_dbh_scale, by = season, k = 5),
+                            #s(proportion_fruit_scale, by = season, k = 5) + 
+                            #s(proportion_native_scale, by = season, k = 5), 
+                          data = yard_GAM_df, 
+                          family = poisson(link = "log"),
+                          method = "REML")
+summary(yard_global_GAM_poi)
+
+# negative binomial family
+yard_global_GAM_nb <- gam(richness ~ season + 
                          s(area_scale, by = season, k = 5) + 
                          s(tree_scale, by = season, k = 5) + 
-                         s(shrub_scale, by = season, k = 5) + 
+                         s(shrub_scale, by = season, k = 5) +
                          s(mean_dbh_scale, by = season, k = 5),
                          #s(proportion_fruit_scale, by = season, k = 5) + 
                          #s(proportion_native_scale, by = season, k = 5), 
-                       data = yard_GAM_df, method = "REML")
-    # note: after standardizing fruiting plants for proportion, the model could 
-    #       run with fruiting plants included
+                       data = yard_GAM_df, 
+                       family = nb(),
+                       method = "REML")
+summary(yard_global_GAM_nb)
+yard_global_GAM_nb$family$getTheta(TRUE) # check for overdispersion
+# theta = 5.481552
 
-summary(yard_global_GAM)
+# AIC test: is Poisson or Negative Binomial family better fit?
+AIC_GAM_family <- AIC(yard_global_GAM_nb, yard_global_GAM_poi)
+  # Conclusion: negative binomial has slightly lower AIC, AND although my mean and variance
+  # SR in breeding are both 4, the mean and variance in migration are 6 and 29, 
+  # suggesting overdispersion
 
 # Visualize
 par(mfrow = c(1,1))
-vis.gam(yard_global_GAM, view = c("shrub_scale","season"), theta = 1, n.grid = 50, lwd = 0.4)
-vis.gam(yard_global_GAM, view = c("mean_dbh_scale","season"), theta = 60, n.grid = 50, lwd = 0.4)
+vis.gam(yard_global_GAM_nb, view = c("shrub_scale","season"), theta = 1, n.grid = 50, lwd = 0.4)
+vis.gam(yard_global_GAM_nb, view = c("mean_dbh_scale","season"), theta = 60, n.grid = 50, lwd = 0.4)
 par(mfrow = c(2,4))
-plot(yard_global_GAM)
+plot(yard_global_GAM_nb)
 
-draw(yard_global_GAM)
+draw(yard_global_GAM_nb)
 
 # --- 2.4 MODEL CHECKING --- #
 
 # 2.41 Concurvity testing
-global_concurvity <- concurvity(yard_global_GAM) # all below 0.8
+global_concurvity <- concurvity(yard_global_GAM_nb) # all below 0.8
 global_concurvity
-# note potential concurvity with mean DBH - be careful!
+# almost concurvity with mean DBH - be careful!
 
 # 2.42 Gam.check
 par(mfrow = c(2,2))
-gam.check(yard_global_GAM) # problem: heteroscedasticity, I fear
+gam.check(yard_global_GAM_nb)
 
 # 2.43 Gratia model check
 par(mfrow = c(2,2))
-appraise(yard_global_GAM) 
-
-
+appraise(yard_global_GAM_nb) # potential problem: heteroscedasticity, I fear
 
 
 
@@ -232,7 +241,9 @@ appraise(yard_global_GAM)
 # 3.32 Season-Area GAM
 yard_season_area_GAM <- gam(richness ~ season + 
                               s(area, by = season, k = 5),
-                            data = yard_GAM_df, method = "REML")
+                            data = yard_GAM_df, 
+                            family = nb(),
+                            method = "REML")
 
 summary(yard_season_area_GAM)
 
@@ -250,31 +261,25 @@ gam.check(yard_season_area_GAM) # problem: low p-values
 
 
 
-
-
-
 # ============================================================================ # 
-# 4. SEASON ONLY GAM
+# 4. NULL GAM
 # ============================================================================ # 
 
 # --- 4.1 QUESTION & HYPOTHESIS --- #
 
 # 4.11 Research Question
-# How does species richness in yards differ by season?
+# Null
 
 # 4.12 Hypothesis & Predictions
-# More species of birds pass through cities during migration than breeding season,
-# thus:
-# Bird species richness is driven by season
-#   Prediction: Species richness in yards differs between migration and breeding
-#         Because of presence of migratory birds in yards during migration
+# Bird species richness in yards is driven by random chance
+#   Prediction: Species richness in yards is the same for migration and breeding
 
 
 # --- 4.2 GAM PREPARATION --- #
 
 # 4.21 Model Components
 #   Response Variable: richness
-#   Fixed Effects (Predictors): season (factor)
+#   Fixed Effects (Predictors): 1
 #   Interactions: none
 #   Random Effects: none
 
@@ -285,79 +290,26 @@ gam.check(yard_season_area_GAM) # problem: low p-values
 
 
 
-# --- 4.3 SEASON GAM --- #
+# --- 4.3 NULL GAM --- #
 
 # 4.31 Variables of GAM data frame and their class
 #   season: factor (migration, breeding)
 #   richness: integer
 
-# 4.32 Season GAM
-yard_season_GAM <- gam(richness ~ season,
-                            data = yard_GAM_df, method = "REML")
-
-summary(yard_season_GAM)
-# not possible to plot ("apparently")
-
-
-
-# --- 4.4 MODEL CHECKING --- #
-
-# 4.42 Gam.check
-par(mfrow = c(2,2))
-gam.check(yard_season_GAM)
-
-
-
-
-
-
-# ============================================================================ # 
-# 5. NULL GAM
-# ============================================================================ # 
-
-# --- 5.1 QUESTION & HYPOTHESIS --- #
-
-# 5.11 Research Question
-# Null
-
-# 5.12 Hypothesis & Predictions
-# Bird species richness in yards is driven by random chance
-#   Prediction: Species richness in yards is the same for migration and breeding
-
-
-# --- 5.2 GAM PREPARATION --- #
-
-# 5.21 Model Components
-#   Response Variable: richness
-#   Fixed Effects (Predictors): 1
-#   Interactions: none
-#   Random Effects: none
-
-# 5.22 Notes about model
-#   Method = REML (Bayesian) (due to reasoning in Woods, 2011)
-#   k = 5 
-#     Because: k cannot be more than 21, so this is just a first guess
-
-
-
-# --- 5.3 NULL GAM --- #
-
-# 5.31 Variables of GAM data frame and their class
-#   season: factor (migration, breeding)
-#   richness: integer
-
-# 5.32 Null GAM
+# 4.32 Null GAM
 yard_null_GAM <- gam(richness ~ 1,
-                       data = yard_GAM_df, method = "REML")
+                     data = yard_GAM_df,
+                     family = nb(),
+                     method = "REML")
 
 summary(yard_null_GAM)
 plot(yard_null_GAM) # not possible to plot ("apparently")
 
 
 
-# --- 5.4 MODEL CHECKING --- #
+# --- 4.4 MODEL CHECKING --- #
 
-# 5.42 Gam.check
+# 4.42 Gam.check
 par(mfrow = c(2,2))
 gam.check(yard_null_GAM)
 
@@ -368,27 +320,26 @@ gam.check(yard_null_GAM)
 
 
 # ============================================================================ # 
-# 6. AIC MODEL SELECTION
+# 5. AIC MODEL SELECTION
 # ============================================================================ # 
 
-# --- 6.1 GAM SELECTION --- #
+# --- 5.1 GAM SELECTION --- #
 
 # Model selection according to AIC
-AIC_yard_GAM <- AIC(yard_global_GAM, yard_season_area_GAM, yard_season_GAM, yard_null_GAM)
+AIC_yard_GAM <- AIC(yard_global_GAM_nb, yard_season_area_GAM, yard_null_GAM)
 AIC_yard_GAM
 
-# result: yard_global_GAM has the lowest AIC value by >25 units
-
+# result: yard_global_GAM has the lowest AIC value by 15 units
 
 
 
 
 
 # ============================================================================ # 
-# 7. PLOTTING OUTPUT OF TOP MODEL
+# 6. PLOTTING OUTPUT OF TOP MODEL
 # ============================================================================ # 
 
-# --- 7.1 CREATE DATAFRAME TO PREDICT FROM --- #
+# --- 6.1 CREATE DATAFRAME TO PREDICT FROM --- #
 
 # Create a function to create a smooth plot from the GAM model from unscaled data
 
@@ -441,7 +392,7 @@ smooth_plot_df <- function(model, var, data, n = 200) {
 
 
 # Summary data for global GAM
-gam_summ <- summary(yard_global_GAM)
+gam_summ <- summary(yard_global_GAM_nb)
 
 # Extract p-values for smoothed yard variables from global GAM
 smooth_pvals <- gam_summ$s.table[, "p-value"]
@@ -467,9 +418,9 @@ season_cols <- c(
 
 
 
-# --- 7.2 PREDICT FROM GAM & VISUALIZE --- #
+# --- 6.2 PREDICT FROM GAM & VISUALIZE --- #
 
-# 7.21 With rug plot to show original data
+# 6.21 With rug plot to show original data
 
 # Create a multi-panel figure showing seasonal smooth effects for predictors
 yard_GAM_figs_rug <- lapply(seq_along(vars), function(i) { # run function once for each variable
@@ -478,7 +429,7 @@ yard_GAM_figs_rug <- lapply(seq_along(vars), function(i) { # run function once f
   
   # generate prediction data frame for variable
   df <- smooth_plot_df(
-    model = yard_global_GAM,
+    model = yard_global_GAM_nb,
     var   = var,
     data  = yard_GAM_df
   )
@@ -549,7 +500,7 @@ gam_fig_predictive_rug
 
 
 
-# 7.22 With data points to show original data
+# 6.22 With data points to show original data
 
 # Create a multi-panel figure showing seasonal smooth effects for predictors
 yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function once for each variable
@@ -558,7 +509,7 @@ yard_GAM_figs_points <- lapply(seq_along(vars), function(i) { # run function onc
   
   # generate prediction data frame for variable
   df <- smooth_plot_df(
-    model = yard_global_GAM,
+    model = yard_global_GAM_nb,
     var   = var,
     data  = yard_GAM_df
   )

@@ -113,7 +113,9 @@ canopy_breeding_GAM_df <- canopy_GAM_df %>%
 mig_25m_veg_GAM <- gam(richness ~
                          s(low_canopy_25m, k = 5) + 
                          s(high_canopy_25m, k = 5),
-                       data = canopy_migration_GAM_df, method = "REML")
+                       data = canopy_migration_GAM_df,
+                       family = nb(),
+                       method = "REML")
 
 summary(mig_25m_veg_GAM)
 concurvity(mig_25m_veg_GAM)
@@ -121,7 +123,9 @@ concurvity(mig_25m_veg_GAM)
 # Just canopy layer
 mig_25m_canopy_GAM <- gam(richness ~ 
                             s(high_canopy_25m, k = 5),
-                          data = canopy_migration_GAM_df, method = "REML")
+                          data = canopy_migration_GAM_df,
+                          family = nb(),
+                          method = "REML")
 
 summary(mig_25m_canopy_GAM)
 concurvity(mig_25m_canopy_GAM)
@@ -133,7 +137,9 @@ concurvity(mig_25m_canopy_GAM)
 mig_50m_veg_GAM <- gam(richness ~
                             s(low_canopy_50m, k = 5) + 
                             s(high_canopy_50m, k = 5),
-                          data = canopy_migration_GAM_df, method = "REML")
+                          data = canopy_migration_GAM_df, 
+                          family = nb(),
+                          method = "REML")
 
 summary(mig_50m_veg_GAM)
 concurvity(mig_50m_veg_GAM) #highly concurve
@@ -141,7 +147,9 @@ concurvity(mig_50m_veg_GAM) #highly concurve
 # Just canopy 
 mig_50m_canopy_GAM <- gam(richness ~
                             s(high_canopy_50m, k = 5),
-                          data = canopy_migration_GAM_df, method = "REML")
+                          data = canopy_migration_GAM_df, 
+                          family = nb(),
+                          method = "REML")
 
 summary(mig_50m_canopy_GAM)
 concurvity(mig_50m_canopy_GAM)
@@ -153,7 +161,9 @@ concurvity(mig_50m_canopy_GAM)
 mig_100m_veg_GAM <- gam(richness ~
                             s(low_canopy_100m, k = 5) + 
                             s(high_canopy_100m, k = 5),
-                          data = canopy_migration_GAM_df, method = "REML")
+                          data = canopy_migration_GAM_df, 
+                          family = nb(),
+                          method = "REML")
 
 summary(mig_100m_veg_GAM)
 concurvity(mig_100m_veg_GAM)
@@ -161,7 +171,9 @@ concurvity(mig_100m_veg_GAM)
 # Just canopy
 mig_100m_canopy_GAM <- gam(richness ~
                              s(high_canopy_100m, k = 5),
-                           data = canopy_migration_GAM_df, method = "REML")
+                           data = canopy_migration_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(mig_100m_canopy_GAM)
 concurvity(mig_100m_canopy_GAM)
@@ -173,7 +185,9 @@ concurvity(mig_100m_canopy_GAM)
 mig_200m_veg_GAM <- gam(richness ~
                              s(low_canopy_200m, k = 5) + 
                              s(high_canopy_200m, k = 5),
-                           data = canopy_migration_GAM_df, method = "REML")
+                           data = canopy_migration_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(mig_200m_veg_GAM)
 concurvity(mig_200m_veg_GAM) #highly concurve
@@ -181,7 +195,9 @@ concurvity(mig_200m_veg_GAM) #highly concurve
 # Just canopy
 mig_200m_canopy_GAM <- gam(richness ~
                              s(high_canopy_200m, k = 5),
-                           data = canopy_migration_GAM_df, method = "REML")
+                           data = canopy_migration_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(mig_200m_canopy_GAM)
 concurvity(mig_200m_canopy_GAM) 
@@ -192,7 +208,9 @@ concurvity(mig_200m_canopy_GAM)
 mig_400m_veg_GAM <- gam(richness ~
                              s(low_canopy_400m, k = 5) + 
                              s(high_canopy_400m, k = 5),
-                           data = canopy_migration_GAM_df, method = "REML")
+                           data = canopy_migration_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(mig_400m_veg_GAM)
 concurvity(mig_400m_veg_GAM) # highly concurve
@@ -200,7 +218,9 @@ concurvity(mig_400m_veg_GAM) # highly concurve
 # Just canopy
 mig_400m_canopy_GAM <- gam(richness ~
                              s(high_canopy_400m, k = 5),
-                           data = canopy_migration_GAM_df, method = "REML")
+                           data = canopy_migration_GAM_df,
+                           family = nb(),
+                           method = "REML")
 
 summary(mig_400m_canopy_GAM)
 concurvity(mig_400m_canopy_GAM)
@@ -236,7 +256,9 @@ AIC_mig_canopy_GAM
 bre_25m_veg_GAM <- gam(richness ~
                             s(low_canopy_25m, k = 5) + 
                             s(high_canopy_25m, k = 5),
-                          data = canopy_breeding_GAM_df, method = "REML")
+                          data = canopy_breeding_GAM_df, 
+                       family = nb(),
+                       method = "REML")
 
 summary(bre_25m_veg_GAM)
 concurvity(bre_25m_veg_GAM)
@@ -244,7 +266,9 @@ concurvity(bre_25m_veg_GAM)
 # Just high canopy
 bre_25m_canopy_GAM <- gam(richness ~
                             s(high_canopy_25m, k = 5),
-                          data = canopy_breeding_GAM_df, method = "REML")
+                          data = canopy_breeding_GAM_df, 
+                          family = nb(),
+                          method = "REML")
 
 summary(bre_25m_canopy_GAM)
 concurvity(bre_25m_canopy_GAM)
@@ -255,7 +279,9 @@ concurvity(bre_25m_canopy_GAM)
 bre_50m_veg_GAM <- gam(richness ~
                             s(low_canopy_50m, k = 5) + 
                             s(high_canopy_50m, k = 5),
-                          data = canopy_breeding_GAM_df, method = "REML")
+                          data = canopy_breeding_GAM_df, 
+                       family = nb(),
+                       method = "REML")
 
 summary(bre_50m_veg_GAM)
 concurvity(mig_50m_veg_GAM) #highly concurve
@@ -263,7 +289,9 @@ concurvity(mig_50m_veg_GAM) #highly concurve
 # Just high canopy
 bre_50m_canopy_GAM <- gam(richness ~
                             s(high_canopy_50m, k = 5),
-                          data = canopy_breeding_GAM_df, method = "REML")
+                          data = canopy_breeding_GAM_df, 
+                          family = nb(),
+                          method = "REML")
 
 summary(bre_50m_canopy_GAM)
 concurvity(mig_50m_canopy_GAM) 
@@ -275,7 +303,9 @@ concurvity(mig_50m_canopy_GAM)
 bre_100m_veg_GAM <- gam(richness ~
                              s(low_canopy_100m, k = 5) + 
                              s(high_canopy_100m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                        family = nb(),
+                        method = "REML")
 
 summary(bre_100m_veg_GAM)
 concurvity(bre_100m_veg_GAM) # highly concurve
@@ -283,7 +313,9 @@ concurvity(bre_100m_veg_GAM) # highly concurve
 # Just high canopy
 bre_100m_canopy_GAM <- gam(richness ~
                              s(high_canopy_100m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(bre_100m_canopy_GAM)
 concurvity(bre_100m_canopy_GAM)
@@ -296,7 +328,9 @@ concurvity(bre_100m_canopy_GAM)
 bre_200m_veg_GAM <- gam(richness ~
                              s(low_canopy_200m, k = 5) + 
                              s(high_canopy_200m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                        family = nb(),
+                        method = "REML")
 
 summary(bre_200m_veg_GAM)
 concurvity(bre_200m_veg_GAM) #highly concurve
@@ -304,7 +338,9 @@ concurvity(bre_200m_veg_GAM) #highly concurve
 # Just high canopy
 bre_200m_canopy_GAM <- gam(richness ~
                              s(high_canopy_200m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(bre_200m_canopy_GAM)
 concurvity(bre_200m_canopy_GAM)
@@ -315,7 +351,9 @@ concurvity(bre_200m_canopy_GAM)
 bre_400m_veg_GAM <- gam(richness ~
                              s(low_canopy_400m, k = 5) + 
                              s(high_canopy_400m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                        family = nb(),
+                        method = "REML")
 
 summary(bre_400m_veg_GAM)
 concurvity(bre_400m_veg_GAM) # highly concurve
@@ -323,7 +361,9 @@ concurvity(bre_400m_veg_GAM) # highly concurve
 # Just high canopy
 bre_400m_canopy_GAM <- gam(richness ~
                              s(high_canopy_400m, k = 5),
-                           data = canopy_breeding_GAM_df, method = "REML")
+                           data = canopy_breeding_GAM_df, 
+                           family = nb(),
+                           method = "REML")
 
 summary(bre_400m_canopy_GAM)
 concurvity(bre_400m_canopy_GAM) # highly concurve
@@ -337,7 +377,7 @@ AIC_bre_veg_GAM <- AIC(bre_25m_veg_GAM,
                        bre_100m_veg_GAM, 
                        bre_200m_veg_GAM, 
                        bre_400m_veg_GAM)
-AIC_bre_veg_GAM
+sort(AIC_bre_canopy_GAM$AIC)
 
 AIC_bre_canopy_GAM <- AIC(bre_25m_canopy_GAM, 
                           bre_50m_canopy_GAM,
@@ -365,13 +405,13 @@ season <- c("migration","migration","migration","migration","migration",
 
 # Calculate ∆AIC for migration season
 AIC_mig <- AIC_mig_canopy_GAM$AIC
-deltaAIC_mig <- AIC_mig_canopy_GAM$AIC - 140.0439
-deltaAIC_mig <- c(1.297754,1.349002,1.678672,0.9670479,0)
+deltaAIC_mig <- AIC_mig_canopy_GAM$AIC - 126.90
+deltaAIC_mig <- c(3.32,2.52,3.33,1.23,0)
 
 # Calculate ∆AIC for breeding season
 AIC_bre <- AIC_bre_canopy_GAM$AIC
-deltaAIC_bre <- AIC_bre_canopy_GAM$AIC - 96.50497
-deltaAIC_bre <- c(0,1.939411,2.073233,1.906869,1.843430)
+deltaAIC_bre <- AIC_bre_canopy_GAM$AIC - 94.81
+deltaAIC_bre <- c(0,0.86,1.30,0.82,0.76)
 
 # Stack ∆AIC values
 AIC <- c(AIC_mig, AIC_bre)
@@ -410,10 +450,10 @@ ggplot(deltaAIC_long, aes(x = scale, y = AIC, group = season, color = season)) +
   
   # shaded intervals above and below 2
   annotate("rect", xmin = -Inf, xmax = Inf,
-           ymin = 96.50497, ymax = 98.50497,
+           ymin = 94.81, ymax = 96.11,
            alpha = 0.2, fill = "#FF4A79") +
   annotate("rect", xmin = -Inf, xmax = Inf,
-           ymin = 140.0439, ymax = 142.0439,
+           ymin = 126.90, ymax = 130.23,
            alpha = 0.2, fill = "#62B751") +
   
   # lines and points
@@ -444,8 +484,8 @@ ggplot(deltaAIC_long, aes(x = scale, y = AIC, group = season, color = season)) +
     data = data.frame(
       season = c("breeding", "migration"),
       xmin = -Inf, xmax = Inf,
-      ymin = c(96.50497, 140.0439),
-      ymax = c(96.50497, 140.0439) + 2
+      ymin = c(94.81, 126.90),
+      ymax = c(94.81, 126.90) + 2
     ),
     aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = season),
     inherit.aes = FALSE,

@@ -56,10 +56,9 @@ big_GAM_df <- landscape_characteristics %>%
 # --- 2.1 QUESTION & HYPOTHESIS --- #
 
 # 2.11 Research Question
-# a. 
+# a. Are yard-level, landscape-level, or a combination of both better predictors of SR?
 
 # 2.12 Hypothesis & Predictions
-# B: 
 #   a. Species richness in yards differs between migration and breeding
 #         Because of presence of migratory birds in yards during migration
 #   b. Different yard habitat features are important for species richness in 
@@ -90,13 +89,15 @@ big_GAM_df <- landscape_characteristics %>%
 
 # --- 2.1 YARD HABITAT FEATURE GAM --- #
 
-yard_global_GAM <- gam(richness ~ season + 
+yard_global_GAM_nb <- gam(richness ~ season + 
                          s(area_scale, by = season, k = 5) + 
                          s(tree_scale, by = season, k = 5) + 
                          s(shrub_scale, by = season, k = 5) + 
                          s(mean_dbh_scale, by = season, k = 5),
-                       data = big_GAM_df, method = "REML")
-summary(yard_global_GAM)
+                       data = big_GAM_df, 
+                       family = nb(),
+                       method = "REML")
+summary(yard_global_GAM_nb)
 
 
 
@@ -106,32 +107,38 @@ summary(yard_global_GAM)
 
 landscape_GAM <- gam(richness ~
                        s(high_canopy_100m_scale, by = season, k = 5),
-                     data = big_GAM_df, method = "REML")
+                     data = big_GAM_df, 
+                     family = nb(),
+                     method = "REML")
 summary(landscape_GAM)
 
 
 # --- 2.3 COMBINED HABITAT FEATURE GAM --- #
-combined_GAM <- gam(richness ~ season + 
+global_GAM <- gam(richness ~ season + 
                       s(area_scale, by = season, k = 5) + 
                       s(tree_scale, by = season, k = 5) + 
                       s(shrub_scale, by = season, k = 5) + 
                       s(mean_dbh_scale, by = season, k = 5) + 
                       s(high_canopy_100m_scale, by = season, k = 5),
-                    data = big_GAM_df, method = "REML")
-summary(combined_GAM)            
+                    data = big_GAM_df, 
+                    family = nb(),
+                    method = "REML")
+summary(global_GAM)            
 
 
 # --- 2.4 NULL GAM --- #
 null_GAM <- gam(richness ~ 1, 
-                data = big_GAM_df, method = "REML")
+                data = big_GAM_df, 
+                family = nb(),
+                method = "REML")
 
 
 # ============================================================================ # 
 # 3. AIC MODEL SELECTION
 # ============================================================================ # \
 
-AIC_big_GAM <- AIC(yard_global_GAM, 
+AIC_big_GAM <- AIC(yard_global_GAM_nb, 
                    landscape_GAM, 
-                   combined_GAM, 
+                   global_GAM, 
                    null_GAM)
 AIC_big_GAM
