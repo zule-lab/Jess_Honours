@@ -33,15 +33,23 @@ yard_features_only <- select(yard_characteristics,
 # Numerical correlation matrix
 cor_matrix_yard <- cor(yard_features_only) # numerical correlation matrix
 cor_matrix_yard
-corrplot(cor_matrix_yard) # visual correlation matrix
+# visual correlation matrix
+corrplot(cor_matrix_yard,
+         method = "color", 
+         type = "lower",        # Show only upper triangle
+         addCoef.col = "black", # Color of the correlation numbers
+         number.cex = 0.8,      # Text size of the numbers
+         tl.col = "black")
 
-# Conclusions: should remove density due to high correlation with trees and shrubs
+# Conclusions: remove vegetation density due to high correlation with trees and shrubs
 
 
 
 # ============================================================================ # 
 # 2. LANDSCAPE HABITAT FEATURES  
 # ============================================================================ # 
+
+# NOTE: no longer relevant given that scale of effect analysis is removed
 
 # --- 2.1 CORRELATION MATRIX --- #
 
@@ -60,15 +68,11 @@ cor_matrix_landscape <- cor(landscape_features_only) # numerical correlation mat
 cor_matrix_landscape
 corrplot(cor_matrix_landscape) # visual correlation matrix
 
-# Conclusions:
-# - low canopy has high collinearity with everything
-# - high canopy also does
-# - the only acceptable variable is high_canopy_25m
+# Conclusions: high collinearity at all scales except 25 m
 # This is probably because the buffers have a lot of spatial overlap with one another
 
-
 # NOTE: collinearity between scales of the same type of cover doesn't really 
-# matter because they are never in the same model anyway
+#       matter because they are never in the same model anyway
 
 # So what we really see here is high collinearity between low and high canopy at 
 # some of the higher spatial scales due to spatial overlap most likely
