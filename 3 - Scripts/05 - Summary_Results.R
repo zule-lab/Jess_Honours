@@ -128,6 +128,14 @@ sdSR_yard <- function(long_df,season){
   return(sd_SR)
 }
 
+varSR_yard <- function(long_df,season){
+  season_long = long_df[long_df$dataset==season,]
+  var_SR = var(season_long$richness)
+  return(var_SR)
+}
+varSR_yard(SR_long, season="mig_total")
+varSR_yard(SR_long, season="breed_total")
+
 # Load data
 SR_long <- read_csv("2 - Cleaned/SR_long.csv")
 
@@ -424,7 +432,6 @@ summary_landscape_features <- as.data.frame( # return data frame, not matrix
     max  = apply(only_landscape_characteristics, 2, function(x) max(x, na.rm = TRUE)) 
   )
 )
-summary_landscape_features
 
 
 

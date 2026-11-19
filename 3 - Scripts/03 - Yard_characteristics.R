@@ -102,7 +102,7 @@ mean_DBH_df <- yard_trees_verified %>%
   # Convert any non-numeric values
   mutate(DBH = as.numeric(DBH),
          Number.stems = as.numeric(Number.stems),
-         adjusted_DBH = DBH/Number.stems) %>%
+         adjusted_DBH = DBH/Number.stems) %>% # accounting for multi-stem shrubs
   # Remove non-numeric values
   filter(!is.na(adjusted_DBH),Number.stems>0) %>%
   # Group by yards
@@ -114,9 +114,7 @@ mean_DBH_df <- yard_trees_verified %>%
   )
 
 
-
-
-# --- 2.4 PROPORTION OF FRUITING PLANTS--- # ******
+# --- 2.4 PROPORTION OF FRUITING PLANTS--- #
 
 # DEF: Calculate the proportion of fruiting plants in each yard.
 # Used information from "Manual of Woody Landscape Plants" by Michael A. Dirr
